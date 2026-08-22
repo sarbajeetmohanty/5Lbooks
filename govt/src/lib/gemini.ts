@@ -36,22 +36,39 @@ export type HistoryMessage = {
   text: string;
 };
 
-function getLanguageInstruction(userText: string): string {
-  const t = userText.toLowerCase();
-  const hinglishWords = [
-    "kaise", "kya", "hai", "karo", "kare", "milega", "aayega", "kitna", "bhai",
-    "sir", "madam", "chahiye", "dena", "paisa", "sasta", "bacho", "bacche",
-    "karna", "chalega", "hoga", "sakte", "batao", "bhejo", "dedo", "kaha",
-    "bataiye", "le", "sakta", "padhe", "dekhe", "de", "dijiye", "raha", "rahi", "bolo", "gst", "tds", "tax"
-  ];
-  const isHinglish = hinglishWords.some(
-    (w) => t.split(/[\s,?.!]+/).includes(w) || t.includes(w + " ") || t.includes(" " + w)
-  );
-
-  if (isHinglish) {
-    return "MANDATORY LANGUAGE: The user asked in HINGLISH (Hindi written in English alphabet). You MUST reply ONLY in natural, simple Hinglish! Never reply in English.";
+export function detectLanguage(text: string): "hinglish" | "hindi" | "english" {
+  if (/[\u0900-\u097F]/.test(text)) {
+    return "hindi";
   }
-  return "MANDATORY LANGUAGE: Reply in the exact same language and tone as the user (English if English, Hinglish if Hinglish, Hindi if Hindi).";
+
+  const t = text.toLowerCase();
+  const hinglishIndicators = [
+    "kya", "kaise", "hai", "hain", "karo", "kare", "karna", "milega", "milta", "aayega",
+    "kitna", "kitne", "bhai", "bhaiya", "sir", "madam", "chahiye", "dena", "dedo",
+    "paisa", "paise", "sasta", "kam", "hoga", "sakte", "sakta", "batao", "bhejo",
+    "kaha", "kidhar", "bataiye", "padhe", "dekhe", "dijiye", "raha", "rahi", "bolo",
+    "nahi", "nahin", "accha", "achha", "acha", "theek", "thik", "kab", "kisko", "kaunsa",
+    "konsa", "isme", "ismein", "mujhe", "tum", "aap", "hum", "le", "lo", "liya"
+  ];
+
+  const words = t.split(/[^a-zA-Z0-9]+/);
+  const hasHinglishWord = words.some((w) => hinglishIndicators.includes(w));
+
+  if (hasHinglishWord) {
+    return "hinglish";
+  }
+  return "english";
+}
+
+function getLanguageInstruction(userText: string): string {
+  const lang = detectLanguage(userText);
+  if (lang === "hindi") {
+    return "MANDATORY LANGUAGE: The user asked in HINDI (Devanagari script). You MUST reply ONLY in standard Hindi (Devanagari script).";
+  }
+  if (lang === "hinglish") {
+    return "MANDATORY LANGUAGE: The user asked in HINGLISH (Hindi in English letters, e.g., 'kaise milega', 'kya kya hai'). You MUST reply 100% ONLY in simple, conversational Hinglish. Do NOT use English sentences.";
+  }
+  return "MANDATORY LANGUAGE: The user asked in ENGLISH. You MUST reply 100% ONLY in clear, natural, friendly ENGLISH. Do NOT use Hindi or Hinglish words.";
 }
 
 export async function generateGeminiResponse(

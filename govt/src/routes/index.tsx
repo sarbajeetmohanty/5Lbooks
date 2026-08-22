@@ -280,9 +280,9 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-[#06140E] text-slate-100 selection:bg-emerald-500 selection:text-slate-950 pb-24">
-      {/* Top Scarcity Alert Bar */}
-      <div className="sticky top-0 z-40 bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-800 border-b border-emerald-500/40 text-white shadow-md">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 text-center text-xs font-bold sm:text-sm">
+      {/* Top Scarcity Alert Bar (Non-fixed, scrolls with page) */}
+      <div className="relative z-10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-800 border-b border-emerald-500/40 text-white shadow-md">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2.5 text-center text-xs font-bold sm:text-sm">
           <span className="flex items-center gap-1.5 text-amber-300 font-extrabold">
             <Sparkles className="h-4 w-4" /> 2026 EDITION FLASH SALE:
           </span>

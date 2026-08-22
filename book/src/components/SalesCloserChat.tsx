@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { generateGeminiResponse } from "@/lib/gemini";
+import { generateGeminiResponse, detectLanguage } from "@/lib/gemini";
 
 type Message = {
   id: string;
@@ -55,75 +55,30 @@ function playWhatsAppChime() {
   }
 }
 
-const EBOOK_KNOWLEDGE_BASE_PROMPT = `You are a friendly library advisor from the Simpex Media Team for the 5,00,000+ eBooks + 500GB Audiobooks Library Bundle.
+const BOOK_KNOWLEDGE_BASE_PROMPT = `You are a real human customer support agent from Simpex Media for the 5,00,000+ Ultimate eBook & Audiobook Library.
 
-#1 TOP PRIORITY RULE - EXACT LANGUAGE & SCRIPT MATCHING (CRITICAL):
-- If user writes in HINGLISH (e.g., "kya hai", "kaise milega", "kitna price hai", "download kaise kare", "sample dikhao", "kaun si books hain"):
-  👉 YOU MUST REPLY 100% IN SIMPLE, SWEET HINGLISH. NEVER REPLY IN ENGLISH!
-- If user writes in ENGLISH: Reply in clear, simple English.
-- If user writes in HINDI (Devanagari): Reply in Hindi.
-- If user writes in regional languages (Tamil, Telugu, Marathi, Bengali, Gujarati): Reply in that exact language.
+#1 TOP PRIORITY RULE - EXACT LANGUAGE & SCRIPT MATCHING:
+- If user writes in ENGLISH: Reply 100% in natural, enthusiastic, clear ENGLISH. Never use Hindi/Hinglish.
+- If user writes in HINGLISH: Reply 100% in sweet, simple HINGLISH. Never use English.
+- If user writes in HINDI (Devanagari): Reply 100% in Hindi (Devanagari script).
 
 #2 TALK IN VERY SIMPLE, COMMON WORDS:
-- Never use difficult English or complicated words.
-- Keep replies to 2 to 3 short, warm, and helpful sentences.
+- Keep answers to 2 to 3 short sentences.
 
-#3 COMPLETE SITE DATA:
-- 5,00,000+ eBooks across top categories: Business, Share Market / Trading, AI & Coding, Self-Help, Mindset, UPSC & Govt Exams, Novels, Fiction, Health, Marketing.
-- Free Bonus: 500GB High-Quality Audiobooks included.
-- Works easily on Mobile phone, Tablet, Laptop, PC and Kindle (PDF & EPUB format).
-- Cost is less than 40 paise per 1000 books! One-time ₹199, lifetime access.
-- 60-second delivery to WhatsApp & Email via Google Drive. 100% money-back guarantee.
+#3 COMPLETE BUNDLE INFO:
+- 5,00,000+ eBooks across 16+ genres: Business, Trading, Investing, AI & Tech, Coding, Self-Help, UPSC, Novels, Biographies, Psychology, Fitness.
+- Free Bonus: 500GB+ HQ Audiobooks (MP3).
+- Formats: PDF & EPUB (read on Mobile, Tablet, Laptop, Kindle).
+- Price: ₹199 one-time payment for lifetime access with unlimited downloads.
+- Delivery: Instant 60-second delivery to WhatsApp & Email via Google Drive. 100% risk-free.
 
-#4 SPECIAL DISCOUNT RULE (ONLY IF USER ASKS):
-- If user asks for a discount/coupon/lower price in Hinglish:
-  "Sir/Ma'am, aap hamare special customer hain! 🎁 Agle 10 minute ke liye humne aapke liye VIP ₹149 offer unlock kar diya hai. Niche diye button par tap karke turant grab kar lijiye!"
-- If user asks in English:
-  "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Tap the button below to grab lifetime access right now!"
-
-#5 ANTI-BYPASS:
-- If user asks random unrelated questions, bring them politely back to helping them unlock this mega library.`;
+#4 DISCOUNT TRIGGER (ONLY IF USER ASKS):
+- If asked in Hinglish: "Sir/Ma'am, aap hamare special customer hain! 🎁 Agle 10 minute ke liye humne aapke liye VIP ₹149 offer unlock kar diya hai. Niche diye button par tap karke turant access grab kar lijiye!"
+- If asked in English: "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Tap the button below to grab lifetime access right now!"`;
 
 function getContextualCta(userText: string, checkoutUrl: string): { label: string; url: string } {
   const t = userText.toLowerCase();
-
-  if (
-    t.includes("discount") ||
-    t.includes("kam") ||
-    t.includes("149") ||
-    t.includes("offer") ||
-    t.includes("coupon") ||
-    t.includes("sasta") ||
-    t.includes("less") ||
-    t.includes("paisa")
-  ) {
-    return { label: "🎁 CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl };
-  }
-
-  if (t.includes("link") || t.includes("drive") || t.includes("delivery") || t.includes("kaise milega")) {
-    return { label: "⚡ GET INSTANT DRIVE ACCESS @ ₹199 ➔", url: checkoutUrl };
-  }
-
-  if (t.includes("safe") || t.includes("trust") || t.includes("fake") || t.includes("scam") || t.includes("refund")) {
-    return { label: "🛡️ UNLOCK 100% RISK-FREE @ ₹199 ➔", url: checkoutUrl };
-  }
-
-  if (
-    t.includes("book") ||
-    t.includes("novel") ||
-    t.includes("audio") ||
-    t.includes("stock") ||
-    t.includes("upsc") ||
-    t.includes("category")
-  ) {
-    return { label: "📚 UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl };
-  }
-
-  return { label: "👉 BUY NOW & GET INSTANT ACCESS @ ₹199 ➔", url: checkoutUrl };
-}
-
-function getPsychologicalFallback(userText: string): { reply: string } {
-  const t = userText.toLowerCase();
+  const lang = detectLanguage(userText);
 
   if (
     t.includes("discount") ||
@@ -136,11 +91,55 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("paisa")
   ) {
     return {
-      reply:
-        "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Niche diye button par tap karke turant access le lijiye! 👇",
+      label: lang === "english" ? "🎁 CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔" : "🎁 CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔",
+      url: checkoutUrl,
     };
   }
 
+  if (t.includes("link") || t.includes("drive") || t.includes("delivery") || t.includes("kaise milega")) {
+    return {
+      label: lang === "english" ? "⚡ GET INSTANT GOOGLE DRIVE ACCESS @ ₹199 ➔" : "⚡ GET INSTANT DRIVE ACCESS @ ₹199 ➔",
+      url: checkoutUrl,
+    };
+  }
+
+  return { label: "👉 BUY NOW & GET INSTANT ACCESS @ ₹199 ➔", url: checkoutUrl };
+}
+
+function getPsychologicalFallback(userText: string): { reply: string } {
+  const t = userText.toLowerCase();
+  const lang = detectLanguage(userText);
+
+  // Discount
+  if (
+    t.includes("discount") ||
+    t.includes("kam") ||
+    t.includes("149") ||
+    t.includes("offer") ||
+    t.includes("coupon") ||
+    t.includes("sasta") ||
+    t.includes("less") ||
+    t.includes("paisa")
+  ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Tap the button below to grab lifetime access right now! 👇",
+      };
+    }
+    if (lang === "hindi") {
+      return {
+        reply:
+          "नमस्ते! आप हमारे विशेष ग्राहक हैं 🎁 अगले 10 मिनट के लिए हमने आपके लिए विशेष ₹149 ऑफर अनलॉक कर दिया है। नीचे दिए बटन पर टैप करके तुरंत लाइफटाइम एक्सेस प्राप्त करें! 👇",
+      };
+    }
+    return {
+      reply:
+        "Sir/Ma'am, aap hamare special customer hain! 🎁 Agle 10 minute ke liye humne aapke liye VIP ₹149 offer unlock kar diya hai. Niche diye button par tap karke turant access le lijiye! 👇",
+    };
+  }
+
+  // Delivery & Access
   if (
     t.includes("link") ||
     t.includes("kaise") ||
@@ -149,12 +148,25 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("delivery") ||
     t.includes("drive")
   ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Within 60 seconds of completing payment, your permanent Google Drive lifetime link will be sent to your WhatsApp and Email! ⚡ You can download and read books anytime.",
+      };
+    }
+    if (lang === "hindi") {
+      return {
+        reply:
+          "भुगतान पूरा होते ही 60 सेकंड के भीतर Google Drive का परमानेंट डाउनलोड लिंक आपके WhatsApp और Email दोनों पर प्राप्त हो जाएगा! ⚡",
+      };
+    }
     return {
       reply:
         "Payment hote hi 1 minute ke andar Google Drive ka permanent link aapke WhatsApp aur Email dono par mil jayega! ⚡ Jab chahein download kijiye aur padhiye. 📥",
     };
   }
 
+  // Categories & Audiobooks
   if (
     t.includes("audiobook") ||
     t.includes("audio") ||
@@ -164,19 +176,33 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("business") ||
     t.includes("novel")
   ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "The library includes 5,00,000+ eBooks across 16+ genres — Business, Trading, AI, Coding, Self-Help, UPSC, Novels, plus 500GB+ Audiobooks included for free! 📚🎧",
+      };
+    }
     return {
       reply:
         "Isme 16 se jyada categories hain — Business, Trading, AI, Coding, Self-Help, UPSC, Novels aur saath me 500GB Audiobooks FREE included hain! 📚🎧",
     };
   }
 
+  // Device compatibility
   if (t.includes("phone") || t.includes("mobile") || t.includes("laptop") || t.includes("kindle")) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Yes! All books are in standard PDF and EPUB formats, perfectly compatible with your Mobile, Tablet, Laptop, Mac, PC, and Kindle devices. 📱💻",
+      };
+    }
     return {
       reply:
         "Haan ji! Sabhi books PDF aur EPUB format me hain, jo aapke Mobile, Tablet, Laptop aur Kindle sab pe bina kisi dikkat ke chalti hain. 📱💻",
     };
   }
 
+  // Trust
   if (
     t.includes("safe") ||
     t.includes("trust") ||
@@ -186,15 +212,28 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("refund") ||
     t.includes("guarantee")
   ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "This is a 100% verified and secure digital library trusted by 85,000+ readers across India. Instant 60-second delivery with a 100% money-back guarantee. 🛡️",
+      };
+    }
     return {
       reply:
-        "100% Safe & Verified hai! 🛡️ 45,000+ readers already join kar chuke hain. Instant 1-minute Google Drive delivery ya 100% money back guarantee hai. ✅",
+        "100% Safe & Trusted eBook library hai! 🛡️ 85,000+ Indian readers ise use kar rahe hain. Instant 60-second delivery aur full money-back guarantee hai. ✅",
     };
   }
 
+  // Default
+  if (lang === "english") {
+    return {
+      reply:
+        "Get instant lifetime access to 5,00,000+ eBooks and 500GB Audiobooks for just ₹199! Permanent Google Drive link delivered in 60 seconds. 🚀",
+    };
+  }
   return {
     reply:
-      "5,00,000+ eBooks aur 500GB Audiobooks ka lifetime Google Drive access abhi sirf ₹199 me mil raha hai. Lifetime validity hai aur unlimited downloads hain! 🚀",
+      "Is library me 5,00,000+ eBooks aur 500GB Audiobooks milte hain. Abhi sirf ₹199 me lifetime access mil raha hai! 🚀",
   };
 }
 

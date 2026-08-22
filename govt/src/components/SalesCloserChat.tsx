@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { generateGeminiResponse } from "@/lib/gemini";
+import { generateGeminiResponse, detectLanguage } from "@/lib/gemini";
 
 type Message = {
   id: string;
@@ -53,83 +53,37 @@ function playWhatsAppChime() {
   }
 }
 
-const GOVT_KNOWLEDGE_BASE_PROMPT = `You are a friendly customer support and tax advisor from the Simpex Media Team for the Complete GST & TDS Filing Kit (2026 Edition).
+const GOVT_KNOWLEDGE_BASE_PROMPT = `You are a friendly, human tax support specialist from Simpex Media for the Complete GST & TDS Filing Kit (2026 Edition).
 
-#1 TOP PRIORITY RULE - EXACT LANGUAGE & SCRIPT MATCHING (CRITICAL):
-- If user writes in HINGLISH (e.g., "kya hai", "kaise milega", "kitna price hai", "download kaise kare", "sample dikhao", "excel spreadsheet kaise use kare"):
-  👉 YOU MUST REPLY 100% IN SIMPLE, SWEET HINGLISH. NEVER REPLY IN ENGLISH!
-- If user writes in ENGLISH: Reply in clear, professional English.
-- If user writes in HINDI (Devanagari): Reply in Hindi.
-- If user writes in regional languages (Tamil, Telugu, Marathi, Bengali, Gujarati): Reply in that exact language.
+#1 STRICT RULE: ALWAYS REPLY IN THE EXACT SAME LANGUAGE & SCRIPT AS THE USER'S LATEST MESSAGE:
+- If user asked in ENGLISH: Reply 100% in natural, fluent, friendly ENGLISH. Never use Hindi/Hinglish.
+- If user asked in HINGLISH: Reply 100% in sweet, simple HINGLISH (Hindi written in English alphabet). Never use English.
+- If user asked in HINDI (Devanagari): Reply 100% in Hindi (Devanagari script).
 
-#2 TALK IN VERY SIMPLE, COMMON WORDS:
-- Never use difficult tax jargon without explaining it simply.
-- Keep replies to 2 to 3 short, warm, and helpful sentences.
+#2 COMMUNICATE IN SIMPLE, COMMON WORDS:
+- Keep replies short (2 to 3 sentences max), warm, helpful, and clear.
 
-#3 COMPLETE SITE DATA:
-- 11-in-1 Complete GST & TDS Filing Toolkit (2026 Edition):
-  1. Complete TDS Filing Guide (TAN/PAN, major sections, payments, return filing, mistakes).
-  2. Complete GST Filing Guide (Registration, GSTR types, ITC rules, invoice essentials).
-  3. Tax Calculation Excel Toolkit (Advance Tax Estimator, GSTR-2B Reconciliation Sheet, TDS Tracker).
-  4. GST & TDS Checklists (Printable process checklists).
-  5. Tax Compliance Calendar (FY 2026-27 timelines & due dates).
-  6. Professional Business Invoice Templates.
-  7. Bonus 1: Business Expense Tracker.
-  8. Bonus 2: Government Resources Directory.
-  9. Bonus 3: Ultimate Tax Document Organizer.
-- Works on Mobile, Tablet, Laptop, and PC (PDF & Excel formats).
+#3 WHAT IS INCLUDED (11 COMPLETE RESOURCES):
+- 📘 1. Complete TDS Filing Guide (TAN/PAN, Sections 194C/194J/194Q/194I, Challan payment, Return workflow, common errors).
+- 📗 2. Complete GST Filing Guide (Registration, GSTR-1, GSTR-3B, GSTR-9, ITC rules, invoice essentials).
+- 📊 3. Tax Calculation & Reconciliation Excel Toolkit (Advance Tax Estimator, GSTR-2B Reconciliation, TDS Tracker).
+- ✅ 4. GST & TDS Compliance Checklists (Printable checklists).
+- 📅 5. Tax Compliance Calendar (FY 2026-27 compliance due dates).
+- 🧾 6. Professional Business Invoice Templates (Ready-to-use).
+- 💰 Bonus 1: Business Expense Tracker Spreadsheet.
+- 🌐 Bonus 2: Government Resources Directory.
+- 📂 Bonus 3: Ultimate Tax Document Organizer.
+- Works seamlessly on Mobile, Tablet, Laptop, and PC (PDF & Excel formats).
 - Price: ₹199 one-time payment for lifetime access with unlimited downloads.
-- 60-second delivery to WhatsApp & Email via Google Drive. 100% money-back guarantee.
+- Delivery: Instant 60-second delivery to WhatsApp & Email via Google Drive. 100% risk-free.
 
-#4 SPECIAL DISCOUNT RULE (ONLY IF USER ASKS):
-- If user asks for a discount/coupon/lower price in Hinglish:
-  "Sir/Ma'am, aap hamare special customer hain! 🎁 Agle 10 minute ke liye humne aapke liye VIP ₹149 offer unlock kar diya hai. Niche diye button par tap karke turant grab kar lijiye!"
-- If user asks in English:
-  "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Tap the button below to grab lifetime access right now!"
-
-#5 ANTI-BYPASS:
-- If user asks random unrelated questions, bring them politely back to helping them organize and master their taxes with this toolkit.`;
+#4 DISCOUNT TRIGGER (ONLY IF USER ASKS):
+- If asked in Hinglish: "Sir/Ma'am, aap hamare special customer hain! 🎁 Agle 10 minute ke liye humne aapke liye VIP ₹149 offer unlock kar diya hai. Niche diye button par tap karke turant access grab kar lijiye!"
+- If asked in English: "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Tap the button below to grab instant lifetime access!"`;
 
 function getContextualCta(userText: string, checkoutUrl: string): { label: string; url: string } {
   const t = userText.toLowerCase();
-
-  if (
-    t.includes("discount") ||
-    t.includes("kam") ||
-    t.includes("149") ||
-    t.includes("offer") ||
-    t.includes("coupon") ||
-    t.includes("sasta") ||
-    t.includes("less") ||
-    t.includes("paisa")
-  ) {
-    return { label: "🎁 CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl };
-  }
-
-  if (t.includes("link") || t.includes("drive") || t.includes("delivery") || t.includes("kaise milega")) {
-    return { label: "⚡ GET INSTANT DRIVE ACCESS @ ₹199 ➔", url: checkoutUrl };
-  }
-
-  if (t.includes("safe") || t.includes("trust") || t.includes("fake") || t.includes("scam") || t.includes("refund")) {
-    return { label: "🛡️ UNLOCK 100% RISK-FREE @ ₹199 ➔", url: checkoutUrl };
-  }
-
-  if (
-    t.includes("gst") ||
-    t.includes("tds") ||
-    t.includes("excel") ||
-    t.includes("template") ||
-    t.includes("calendar") ||
-    t.includes("sheet")
-  ) {
-    return { label: "📗 GET 11-IN-1 GST & TDS KIT @ ₹199 ➔", url: checkoutUrl };
-  }
-
-  return { label: "👉 BUY NOW & GET INSTANT ACCESS @ ₹199 ➔", url: checkoutUrl };
-}
-
-function getPsychologicalFallback(userText: string): { reply: string } {
-  const t = userText.toLowerCase();
+  const lang = detectLanguage(userText);
 
   if (
     t.includes("discount") ||
@@ -142,11 +96,55 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("paisa")
   ) {
     return {
-      reply:
-        "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Niche diye button par tap karke turant access le lijiye! 👇",
+      label: lang === "english" ? "🎁 CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔" : "🎁 CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔",
+      url: checkoutUrl,
     };
   }
 
+  if (t.includes("link") || t.includes("drive") || t.includes("delivery") || t.includes("kaise milega")) {
+    return {
+      label: lang === "english" ? "⚡ GET INSTANT GOOGLE DRIVE ACCESS @ ₹199 ➔" : "⚡ GET INSTANT DRIVE ACCESS @ ₹199 ➔",
+      url: checkoutUrl,
+    };
+  }
+
+  return { label: "👉 GET COMPLETE GST & TDS KIT @ ₹199 ➔", url: checkoutUrl };
+}
+
+function getPsychologicalFallback(userText: string): { reply: string } {
+  const t = userText.toLowerCase();
+  const lang = detectLanguage(userText);
+
+  // Discount
+  if (
+    t.includes("discount") ||
+    t.includes("kam") ||
+    t.includes("149") ||
+    t.includes("offer") ||
+    t.includes("coupon") ||
+    t.includes("sasta") ||
+    t.includes("less") ||
+    t.includes("paisa")
+  ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Tap the button below to grab lifetime access right now! 👇",
+      };
+    }
+    if (lang === "hindi") {
+      return {
+        reply:
+          "नमस्ते! आप हमारे विशेष ग्राहक हैं 🎁 अगले 10 मिनट के लिए हमने आपके लिए विशेष ₹149 ऑफर अनलॉक कर दिया है। नीचे दिए बटन पर टैप करके तुरंत लाइफटाइम एक्सेस प्राप्त करें! 👇",
+      };
+    }
+    return {
+      reply:
+        "Sir/Ma'am, aap hamare special customer hain! 🎁 Agle 10 minute ke liye humne aapke liye VIP ₹149 offer unlock kar diya hai. Niche diye button par tap karke turant access le lijiye! 👇",
+    };
+  }
+
+  // Delivery & Access
   if (
     t.includes("link") ||
     t.includes("kaise") ||
@@ -155,12 +153,25 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("delivery") ||
     t.includes("drive")
   ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Within 60 seconds of completing payment, your permanent Google Drive lifetime access link will be delivered directly to your WhatsApp and Email! ⚡ You can download and use all files anytime.",
+      };
+    }
+    if (lang === "hindi") {
+      return {
+        reply:
+          "भुगतान पूरा होते ही 60 सेकंड के भीतर Google Drive का परमानेंट डाउनलोड लिंक आपके WhatsApp और Email दोनों पर प्राप्त हो जाएगा! ⚡",
+      };
+    }
     return {
       reply:
         "Payment complete hote hi 60 seconds ke andar Google Drive ka permanent link aapke WhatsApp aur Email dono par receive ho jayega! ⚡ Jab chahein download aur use kijiye. 📥",
     };
   }
 
+  // Excel tools
   if (
     t.includes("excel") ||
     t.includes("sheet") ||
@@ -168,19 +179,33 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("template") ||
     t.includes("reconciliation")
   ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Yes! It includes ready-to-use Excel spreadsheets for Advance Tax Estimation, GSTR-2B Reconciliation, and TDS Deduction Tracking with pre-set formulas. 📊",
+      };
+    }
     return {
       reply:
         "Isme Advance Tax Estimator, GSTR-2B Reconciliation Sheet aur TDS Tracker ke ready-to-use Excel templates included hain jinme formulas pehle se set hain! 📊",
     };
   }
 
+  // Beginner friendly
   if (t.includes("beginner") || t.includes("fresh") || t.includes("easy") || t.includes("start")) {
+    if (lang === "english") {
+      return {
+        reply:
+          "This toolkit is 100% beginner-friendly! All GST & TDS concepts are explained in simple language with practical real-life examples and step-by-step checklists. 📗",
+      };
+    }
     return {
       reply:
         "Ye kit bilkul beginner-friendly hai! Sabhi TDS aur GST concepts ko aasan bhasha, practical examples aur step-by-step checklists ke sath samjhaya gaya hai. 📗",
     };
   }
 
+  // Trust / Safe
   if (
     t.includes("safe") ||
     t.includes("trust") ||
@@ -190,12 +215,25 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("refund") ||
     t.includes("guarantee")
   ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "This is a 100% verified and secure digital toolkit trusted by thousands of Indian businesses, freelancers, and accountants. Instant 60-second delivery with a 100% satisfaction guarantee. 🛡️",
+      };
+    }
     return {
       reply:
-        "100% Safe & Verified toolkit hai! 🛡️ Thousands of business owners & CAs ise use kar rahe hain. Instant 60-second delivery ya 100% money back guarantee hai. ✅",
+        "100% Safe & Verified toolkit hai! 🛡️ Thousands of business owners & CAs ise use kar rahe hain. Instant 60-second delivery aur 100% money back guarantee hai. ✅",
     };
   }
 
+  // Default
+  if (lang === "english") {
+    return {
+      reply:
+        "The Complete GST & TDS Filing Kit (2026 Edition) includes 11 powerful resources — Step-by-Step Guides, Excel Calculators, Checklists, Calendar, and Invoices. Get lifetime access today for just ₹199! 🚀",
+    };
+  }
   return {
     reply:
       "Is Complete GST & TDS Filing Kit (2026 Edition) me 11 powerful resources milte hain — Guides, Excel tools, Checklists aur Invoices. Abhi sirf ₹199 me lifetime access mil raha hai! 🚀",
