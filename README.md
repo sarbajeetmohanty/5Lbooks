@@ -23,6 +23,7 @@ npm run build
 ```
 
 The build outputs:
+
 - **Client static assets**: `.output/public`
 - **SSR Server bundle**: `.output/server`
 
@@ -31,12 +32,14 @@ The build outputs:
 ## 🌐 Deploying to Hostinger
 
 ### Option A: Static Deployment (Shared Hosting / `public_html`)
+
 1. Run `npm run build` locally.
 2. Go to Hostinger File Manager -> `public_html`.
 3. Upload all contents from the `.output/public` folder into your `public_html` directory.
 4. Ensure `.htaccess` is present for SPA routing.
 
 ### Option B: Node.js App Deployment (Hostinger VPS / Node.js Hosting)
+
 1. Clone this repository on your Hostinger server:
    ```bash
    git clone https://github.com/sarbajeetmohanty/5Lbooks.git
@@ -52,8 +55,8 @@ The build outputs:
 ---
 
 ## 🛠️ Tech Stack
+
 - **Framework**: TanStack Start + React 19
 - **Bundler**: Vite 8 + Nitro
 - **Styling**: Tailwind CSS v4 + OKLCH colors + Radix UI Primitives
 - **Icons**: Lucide React
-

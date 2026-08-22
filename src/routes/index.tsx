@@ -326,6 +326,8 @@ function Index() {
             alt="Simpex Media Library logo"
             width={96}
             height={96}
+            fetchPriority="high"
+            decoding="async"
             className="h-14 w-14 rounded-2xl bg-card p-1 shadow-[var(--shadow-soft)] sm:h-16 sm:w-16"
           />
           <p className="whitespace-nowrap text-xl font-extrabold tracking-tight sm:text-3xl">
@@ -455,6 +457,7 @@ function Index() {
               width={1024}
               height={768}
               loading="lazy"
+              decoding="async"
               className="w-full rounded-2xl border border-border object-cover shadow-[var(--shadow-soft)]"
             />
           ))}
