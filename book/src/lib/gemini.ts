@@ -28,7 +28,7 @@ let currentKeyIndex = 0;
 function getNextApiKey(): string {
   const key = GEMINI_KEYS[currentKeyIndex];
   currentKeyIndex = (currentKeyIndex + 1) % GEMINI_KEYS.length;
-  return key;
+  return key || "";
 }
 
 export type HistoryMessage = {

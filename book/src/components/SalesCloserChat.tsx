@@ -314,7 +314,7 @@ export function SalesCloserChat({
     try {
       let replyText = "";
       try {
-        replyText = await generateGeminiResponse(EBOOK_KNOWLEDGE_BASE_PROMPT, text, messages);
+        replyText = await generateGeminiResponse(BOOK_KNOWLEDGE_BASE_PROMPT, text, messages);
       } catch {
         const fb = getPsychologicalFallback(text);
         replyText = fb.reply;
