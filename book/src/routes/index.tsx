@@ -15,6 +15,8 @@ import booksHindi2 from "@/assets/books-hindi-2.jpg";
 import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { StickyTimerBar } from "@/components/StickyTimerBar";
 import { PaymentBadges } from "@/components/PaymentBadges";
+import { ComparisonTable } from "@/components/ComparisonTable";
+import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 import { indianBuyers, relativeTimeOptions, type Buyer } from "@/data/buyers";
 
 import heroVideo from "@/assets/hero-video.mp4.asset.json";
@@ -590,6 +592,9 @@ function Index() {
         </div>
       </section>
 
+      {/* Value Comparison & Guarantee */}
+      <ComparisonTable />
+
       <Section title="Frequently Asked Questions" tone="muted">
         <Accordion type="single" collapsible className="mx-auto max-w-3xl text-left">
           {faqs.map(([q, a]) => (
@@ -649,6 +654,9 @@ function Index() {
       <StickyTimerBar checkoutUrl={CHECKOUT_URL} />
 
       <PurchasePopup />
+
+      {/* Floating WhatsApp Live Assistant */}
+      <WhatsAppWidget />
 
       {/* Exit Intent Modal for eBook Library */}
       <ExitIntentModal
