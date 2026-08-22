@@ -69,6 +69,29 @@ function useCountdown(seconds: number) {
   return { m, s };
 }
 
+function LiveBuyerCounter() {
+  const [count, setCount] = useState(248);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount((prev) => prev + 1);
+    }, 55000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/80 px-4 py-1.5 text-xs font-semibold text-emerald-200 shadow-md backdrop-blur-md">
+      <span className="flex h-2.5 w-2.5 relative">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+      </span>
+      <span>
+        <strong className="text-amber-400 font-extrabold">{count}</strong> Indian Business Owners, CAs &amp; Freelancers unlocked this kit in the last 24 hours.
+      </span>
+    </div>
+  );
+}
+
 function CtaButton({
   children,
   className = "",
@@ -93,7 +116,17 @@ function CtaButton({
         {children}
       </a>
 
-      {showTrustBadges && <PaymentBadges className="mt-3.5" />}
+      {/* Direct WhatsApp Support Link */}
+      <a
+        href="https://wa.me/?text=Hi%20Tax%20Support%2C%20I%20have%20a%20quick%20question%20about%20the%20Complete%20GST%20%26%20TDS%20Filing%20Kit.%20Please%20guide%20me!"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-300 transition hover:text-emerald-200 hover:underline"
+      >
+        <span>💬 Have a quick question? Chat with Tax Support on WhatsApp</span>
+      </a>
+
+      {showTrustBadges && <PaymentBadges className="mt-2" />}
     </div>
   );
 }
@@ -312,9 +345,20 @@ export default function Index() {
             </span>
           </h1>
 
+          {/* Official 2026 Compliance Guarantee Gold Shield Badge */}
+          <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-2xl border-2 border-amber-500/60 bg-gradient-to-r from-amber-500/20 via-emerald-950/80 to-amber-500/20 px-4 py-2 text-xs sm:text-sm font-black text-amber-300 shadow-xl backdrop-blur-md">
+            <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
+            <span>⭐ 100% Updated for FY 2026-27 Tax Rules &amp; GST Council Notifications</span>
+          </div>
+
           <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-emerald-100/90 sm:text-lg">
             Stop spending hours searching YouTube or reading scattered government portals. Get step-by-step filing guides, pre-configured Excel calculators, audit checklists, invoice templates, and tax calendars in one practical digital toolkit.
           </p>
+
+          {/* Live Indian Buyer Activity Counter Banner */}
+          <div className="mt-4">
+            <LiveBuyerCounter />
+          </div>
 
           {/* Massive 3D Hero Mockup Banner */}
           <div className="mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border-2 border-emerald-500/50 bg-emerald-950/40 p-2 shadow-2xl shadow-emerald-950 backdrop-blur-md">

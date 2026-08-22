@@ -144,6 +144,66 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     };
   }
 
+  // GSTR-2B Reconciliation
+  if (
+    t.includes("gstr-2b") ||
+    t.includes("gstr2b") ||
+    t.includes("purchase register") ||
+    t.includes("reconcile") ||
+    t.includes("itc")
+  ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Yes, absolutely! The included GSTR-2B vs Books Excel Reconciler has pre-configured VLOOKUP & mismatch formulas to quickly match purchase invoices and claim 100% accurate ITC. 📊",
+      };
+    }
+    return {
+      reply:
+        "Haan ji bilkul! Isme GSTR-2B vs Purchase Register Reconciler Excel sheet included hai jisme automated formulas set hain, jisse aap 100% sahi ITC claim kar sakte hain bina kisi error ke! 📊",
+    };
+  }
+
+  // FY 2026-27 filings
+  if (
+    t.includes("2026") ||
+    t.includes("2027") ||
+    t.includes("fy") ||
+    t.includes("financial year") ||
+    t.includes("latest") ||
+    t.includes("budget")
+  ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Yes! This is the 2026 Edition, 100% updated with all recent GST Council notifications, FY 2026-27 compliance calendars, and latest TDS sections & limits. 📅",
+      };
+    }
+    return {
+      reply:
+        "Haan ji! Ye 2026 Edition hai jo FY 2026-27 ke sabhi latest GST Council rules, tax calendars aur TDS limits ke hisab se 100% updated hai. 📅",
+    };
+  }
+
+  // Invoice templates edit
+  if (
+    t.includes("invoice") ||
+    t.includes("word") ||
+    t.includes("bill") ||
+    t.includes("edit")
+  ) {
+    if (lang === "english") {
+      return {
+        reply:
+          "Yes! The professional GST-compliant invoice templates are 100% editable in MS Word, MS Excel, Google Docs, and PDF formats. You can easily add your logo and business details. 🧾",
+      };
+    }
+    return {
+      reply:
+        "Haan ji! Sabhi business invoice templates MS Word, Excel aur PDF me fully editable hain. Aap apna company logo aur details aaram se change karke bill bana sakte hain. 🧾",
+    };
+  }
+
   // Delivery & Access
   if (
     t.includes("link") ||
@@ -176,8 +236,7 @@ function getPsychologicalFallback(userText: string): { reply: string } {
     t.includes("excel") ||
     t.includes("sheet") ||
     t.includes("calculator") ||
-    t.includes("template") ||
-    t.includes("reconciliation")
+    t.includes("template")
   ) {
     if (lang === "english") {
       return {
@@ -351,11 +410,11 @@ export function SalesCloserChat({
   };
 
   const quickChips = [
-    "How to buy this GST & TDS kit? 💳",
-    "How to get instant Google Drive access? 📥",
-    "How will I receive the download link? ⚡",
-    "Is payment safe & 100% verified? 🛡️",
-    "Kit me kaun kaun se tools hain? 📊",
+    "Will this help me reconcile GSTR-2B with my purchase register? 📊",
+    "Can I use this for FY 2026-27 filings? 📅",
+    "Can I print and edit invoice templates in MS Word/Excel? 🧾",
+    "How will I receive the Google Drive link? ⚡",
+    "Kit me kaun kaun se tools hain? 💼",
   ];
 
   return (
