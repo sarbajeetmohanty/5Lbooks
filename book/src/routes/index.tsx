@@ -16,7 +16,7 @@ import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { StickyTimerBar } from "@/components/StickyTimerBar";
 import { PaymentBadges } from "@/components/PaymentBadges";
 import { ComparisonTable } from "@/components/ComparisonTable";
-import { WhatsAppWidget } from "@/components/WhatsAppWidget";
+import { SalesCloserChat } from "@/components/SalesCloserChat";
 import { indianBuyers, relativeTimeOptions, type Buyer } from "@/data/buyers";
 
 import heroVideo from "@/assets/hero-video.mp4.asset.json";
@@ -655,8 +655,8 @@ function Index() {
 
       <PurchasePopup />
 
-      {/* Floating WhatsApp Live Assistant */}
-      <WhatsAppWidget />
+      {/* AI Sales Closer Live Chat (WhatsApp Style) */}
+      <SalesCloserChat checkoutUrl={CHECKOUT_URL} />
 
       {/* Exit Intent Modal for eBook Library */}
       <ExitIntentModal
