@@ -12,50 +12,93 @@ type Message = {
   };
 };
 
-const SYSTEM_PROMPT = `You are "Rohan", a senior digital library consultant and sales closer for Simpex Media Library (5,00,000+ Premium eBooks + 500GB Audiobooks Bundle).
+const SYSTEM_PROMPT = `You are a high-performing, intellectual, and highly persuasive senior library advisor from the Simpex Media team for "5,00,000+ Premium eBooks + 500GB Audiobooks Library Bundle".
 
-CRITICAL SALES & PSYCHOLOGY RULES:
-1. PRIMARY GOAL: Reassure the reader and convert them to buy the 5,00,000+ eBooks + Audiobooks bundle now at ₹199 (or ₹149 if they ask for a discount).
-2. DELIVERY TRUTH: Immediately upon payment, a permanent Google Drive lifetime access link is delivered within 60 seconds to their WhatsApp & Email for unlimited lifetime downloads & reading.
-3. LANGUAGE MATCHING: MUST reply in the exact language the user wrote (Hinglish, Hindi, English, Tamil, Telugu, Marathi, Bengali, etc.).
-4. KEY FACTS:
+YOUR MISSION & PSYCHOLOGY GUIDELINES:
+1. GREETING & IDENTITY: Always identify as "Simpex Media Team". Be sharp, polite, and encouraging.
+2. DISCOUNT & PRICING OBJECTION (SPECIAL CUSTOMER RULE):
+   - Whenever the user asks for a discount, coupon, says the price is high, or hesitates on paying ₹199, you MUST say:
+     "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. You can grab full lifetime access right now!" (in the user's language).
+3. DELIVERY TRUTH:
+   - Always assure them: "Payment complete hote hi 60 seconds ke andar Google Drive ka permanent lifetime link aapke WhatsApp aur Email dono par receive ho jayega."
+4. CORE LIBRARY HIGHLIGHTS:
    - 5,00,000+ eBooks across 16+ categories (Business, Stock Market, Coding, AI, Self-Help, Psychology, UPSC, Novels, Fiction).
-   - BONUS: 500GB High-Quality Audiobooks included completely FREE.
-   - Compatibility: Read on Mobile, Tablet, Laptop & Kindle anytime.
-   - Value: Costs less than ₹0.0004 per book with zero recurring subscriptions.
-   - 100% Risk-Free: 60-Second Instant Delivery Guarantee & Full Support.
-5. CONCISENESS: Keep answers strictly 2 to 3 sentences maximum. Be intellectual, helpful, encouraging, and always include a friendly conversion nudge.`;
+   - FREE BONUS: 500GB High-Quality Audiobooks included.
+   - Read on Mobile, Tablet, Laptop & Kindle.
+   - Less than ₹0.0004 per book with zero recurring subscriptions.
+5. LANGUAGE MIRRORING:
+   - Match the user's exact language (Hinglish, Hindi, English, Tamil, Telugu, Marathi, Bengali, etc.).
+6. CONCISENESS & CLOSING:
+   - Keep answers strictly 2 to 3 sentences. Never write boring robotic paragraphs. Always end with a comforting call to action.`;
 
 function getPsychologicalFallback(userText: string): { reply: string; show149?: boolean } {
   const t = userText.toLowerCase();
 
-  if (t.includes("link") || t.includes("kaise") || t.includes("how") || t.includes("receive") || t.includes("delivery") || t.includes("drive")) {
+  if (
+    t.includes("discount") ||
+    t.includes("kam") ||
+    t.includes("price") ||
+    t.includes("149") ||
+    t.includes("offer") ||
+    t.includes("coupon") ||
+    t.includes("sasta") ||
+    t.includes("paisa") ||
+    t.includes("less")
+  ) {
     return {
-      reply: "Payment hote hi Google Drive ka permanent link aapke WhatsApp aur Email dono par turant (within 60 seconds) aa jayega! ⚡ Lifetime validity hai, jitni baar chahein download kijiye. 📥",
-    };
-  }
-
-  if (t.includes("discount") || t.includes("kam") || t.includes("price") || t.includes("149") || t.includes("offer") || t.includes("coupon") || t.includes("sasta")) {
-    return {
-      reply: "Special Offer! 🎁 Kyunki aap reading aur personal growth ke liye committed hain, main aapke liye secret ₹149 ka instant discount unlock kar raha hoon! Niche button par click karke grab kar lijiye: 👇",
+      reply:
+        "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Niche diye button par tap karke instant lifetime access grab kar lijiye: 👇",
       show149: true,
     };
   }
 
-  if (t.includes("audiobook") || t.includes("audio") || t.includes("hindi") || t.includes("category") || t.includes("topic") || t.includes("stock") || t.includes("business")) {
+  if (
+    t.includes("link") ||
+    t.includes("kaise") ||
+    t.includes("how") ||
+    t.includes("receive") ||
+    t.includes("delivery") ||
+    t.includes("drive")
+  ) {
     return {
-      reply: "Isme 16+ top categories hain — Business, Stock Market, AI, Coding, Mindset, UPSC, Novels aur saath mein 500GB high-quality Audiobooks FREE bonus included hain! 🎧📚",
+      reply:
+        "Payment complete hote hi 60 seconds ke andar Google Drive ka permanent lifetime link aapke WhatsApp aur Email dono par turant mil jayega! ⚡ Lifetime validity hai, jitni baar chahein download aur read kijiye. 📥",
     };
   }
 
-  if (t.includes("safe") || t.includes("trust") || t.includes("fake") || t.includes("real") || t.includes("scam") || t.includes("refund")) {
+  if (
+    t.includes("audiobook") ||
+    t.includes("audio") ||
+    t.includes("hindi") ||
+    t.includes("category") ||
+    t.includes("topic") ||
+    t.includes("stock") ||
+    t.includes("business")
+  ) {
     return {
-      reply: "100% Verified & Safe! 🛡️ Abhi tak 45,000+ readers ne library unlock ki hai. UPI/Cards se payment hote hi 60 seconds mein drive access milta hai with Money-Back Guarantee! ✅",
+      reply:
+        "Isme 16+ top categories hain — Business, Stock Market, AI, Coding, Mindset, UPSC, Novels aur saath mein 500GB high-quality Audiobooks FREE bonus included hain! 🎧📚",
+    };
+  }
+
+  if (
+    t.includes("safe") ||
+    t.includes("trust") ||
+    t.includes("fake") ||
+    t.includes("real") ||
+    t.includes("scam") ||
+    t.includes("refund") ||
+    t.includes("guarantee")
+  ) {
+    return {
+      reply:
+        "100% Verified & Safe! 🛡️ Abhi tak 45,000+ readers ne library unlock ki hai. Instant Drive access within 60 seconds or 100% money-back guarantee! ✅",
     };
   }
 
   return {
-    reply: "Ji! 5,00,000+ eBooks aur 500GB Audiobooks ka lifetime Google Drive access abhi sirf ₹199 mein mil raha hai (less than ₹0.0004 per book). Kya main aapko direct checkout link share karoon? 🚀",
+    reply:
+      "Ji! 5,00,000+ eBooks aur 500GB Audiobooks ka lifetime Google Drive access abhi sirf ₹199 mein mil raha hai (less than ₹0.0004 per book). Kya main aapko direct checkout link share karoon? 🚀",
   };
 }
 
@@ -69,7 +112,7 @@ export function SalesCloserChat({
     {
       id: "m1",
       sender: "agent",
-      text: "Namaste! 👋 Main Rohan hoon Simpex Media Library se. 5,00,000+ eBooks ya Audiobooks ke regarding koi bhi sawal ho, please puchiye. Drive access instant milta hai! 📚",
+      text: "Hey! 👋 We are from Simpex Media team. How can we help you unlock your instant Google Drive access today?",
       time: "Just now",
     },
   ]);
@@ -104,7 +147,9 @@ export function SalesCloserChat({
       text.toLowerCase().includes("kam") ||
       text.toLowerCase().includes("149") ||
       text.toLowerCase().includes("offer") ||
-      text.toLowerCase().includes("sasta");
+      text.toLowerCase().includes("sasta") ||
+      text.toLowerCase().includes("less") ||
+      text.toLowerCase().includes("coupon");
 
     try {
       let replyText = "";
@@ -123,11 +168,11 @@ export function SalesCloserChat({
           text: replyText,
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           cta: isDiscountQuery
-            ? { label: "CLAIM ₹149 DISCOUNT ACCESS ➔", url: checkoutUrl }
+            ? { label: "CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl }
             : { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl },
         };
         setMessages((prev) => [...prev, agentMsg]);
-      }, 700);
+      }, 650);
     } catch {
       setIsTyping(false);
       const fb = getPsychologicalFallback(text);
@@ -136,7 +181,9 @@ export function SalesCloserChat({
         sender: "agent",
         text: fb.reply,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        cta: { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl },
+        cta: isDiscountQuery
+          ? { label: "CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl }
+          : { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl },
       };
       setMessages((prev) => [...prev, agentMsg]);
     }
@@ -144,8 +191,8 @@ export function SalesCloserChat({
 
   const quickChips = [
     "Google Drive link kaise milega? 📥",
+    "Special discount milega kya? 🎁",
     "Audiobooks bonus included hai? 🎧",
-    "Special discount milega kya? 💰",
     "Mobile & Laptop dono pe chalega? 📱",
   ];
 
@@ -165,7 +212,7 @@ export function SalesCloserChat({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#25D366]" />
           </span>
-          <span>Have a question? <strong className="text-[#25D366]">Chat with Rohan</strong></span>
+          <span>Have a question? <strong className="text-[#25D366]">Chat with Us</strong></span>
         </button>
 
         <button
@@ -200,16 +247,16 @@ export function SalesCloserChat({
               </div>
               <div>
                 <p className="text-sm font-black flex items-center gap-1">
-                  <span>Rohan (Simpex Library)</span>
+                  <span>Simpex Media Team</span>
                   <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-full font-bold">Verified</span>
                 </p>
-                <p className="text-[10px] text-emerald-200">Online • Powered by Gemini 3.6 Flash</p>
+                <p className="text-[10px] text-emerald-200">Online • Instant Google Drive Support</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="grid h-8 w-8 place-items-center rounded-full bg-black/20 text-sm font-bold text-white transition hover:bg-black/40"
+              className="grid h-8 w-8 place-items-center rounded-full bg-black/20 text-sm font-bold text-white transition hover:bg-black/40 cursor-pointer"
             >
               ✕
             </button>
@@ -236,7 +283,7 @@ export function SalesCloserChat({
                     {m.cta && (
                       <a
                         href={m.cta.url}
-                        className="mt-2.5 block rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 py-2 text-center text-[11px] font-black uppercase text-black shadow-md transition hover:scale-102 active:scale-98"
+                        className="mt-2.5 block rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 py-2.5 text-center text-[11px] font-black uppercase text-black shadow-md transition hover:scale-102 active:scale-98"
                       >
                         {m.cta.label}
                       </a>
@@ -251,7 +298,7 @@ export function SalesCloserChat({
 
             {isTyping && (
               <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-none bg-[#202C33] px-3.5 py-2 text-xs text-[#8696a0] w-fit animate-pulse">
-                <span>Rohan is typing</span>
+                <span>Simpex Team is typing</span>
                 <span className="animate-bounce">...</span>
               </div>
             )}
