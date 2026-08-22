@@ -15,7 +15,6 @@ import booksHindi2 from "@/assets/books-hindi-2.jpg";
 import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { StickyTimerBar } from "@/components/StickyTimerBar";
 import { PaymentBadges } from "@/components/PaymentBadges";
-import { ComparisonTable } from "@/components/ComparisonTable";
 import { SalesCloserChat } from "@/components/SalesCloserChat";
 import { indianBuyers, relativeTimeOptions, type Buyer } from "@/data/buyers";
 
@@ -591,9 +590,6 @@ function Index() {
           </div>
         </div>
       </section>
-
-      {/* Value Comparison & Guarantee */}
-      <ComparisonTable />
 
       <Section title="Frequently Asked Questions" tone="muted">
         <Accordion type="single" collapsible className="mx-auto max-w-3xl text-left">

@@ -10,7 +10,6 @@ import {
 import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { StickyTimerBar } from "@/components/StickyTimerBar";
 import { PaymentBadges } from "@/components/PaymentBadges";
-import { ComparisonTable } from "@/components/ComparisonTable";
 import { SalesCloserChat } from "@/components/SalesCloserChat";
 import { indianBuyers, relativeTimeOptions, type Buyer } from "@/data/buyers";
 import {
@@ -497,19 +496,6 @@ export default function Index() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Comparison Table Section */}
-      <section className="mx-auto max-w-5xl px-4 py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-black text-white sm:text-4xl">
-            See How This Toolkit Compares
-          </h2>
-          <p className="mx-auto mt-2 max-w-xl text-xs sm:text-sm text-muted-foreground">
-            Why thousands of Indian businesses and freelancers prefer this ready-to-use kit over confusing tutorials or expensive consulting retainers.
-          </p>
-        </div>
-        <ComparisonTable />
       </section>
 
       {/* WhatsApp Social Proof Gallery */}
