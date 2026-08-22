@@ -224,10 +224,11 @@ export function SalesCloserChat({
   };
 
   const quickChips = [
-    "Google Drive link kaise milega? 📥",
-    "Kaun kaun si books hain? 📚",
-    "Mobile & Laptop pe chalega? 📱",
-    "Payment safe hai na? 🔒",
+    "How to buy this library bundle? 💳",
+    "How to get instant Google Drive access? 📥",
+    "How will I receive the download link? ⚡",
+    "Is payment safe & 100% verified? 🛡️",
+    "Kaun kaun si category books hain? 📚",
   ];
 
   return (
