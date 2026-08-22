@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { generateGeminiResponse } from "@/lib/gemini";
 
 type Message = {
   id: string;
@@ -11,21 +12,19 @@ type Message = {
   };
 };
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
-
 const SYSTEM_PROMPT = `You are "Rohan", a senior digital library consultant and sales closer for Simpex Media Library (5,00,000+ Premium eBooks + 500GB Audiobooks Bundle).
 
-CRITICAL SALES RULES (Based on High-Converting Indian Consumer Psychology):
-1. GOAL: Convert the reader to complete the ₹199 purchase immediately (or ₹149 if they ask for a discount).
-2. TONE: Sharp, intellectual, helpful, encouraging, and authoritative.
-3. LANGUAGE MATCHING: MUST reply in the exact language the user wrote (Hinglish, Hindi, English, Tamil, Telugu, etc.).
+CRITICAL SALES & PSYCHOLOGY RULES:
+1. PRIMARY GOAL: Reassure the reader and convert them to buy the 5,00,000+ eBooks + Audiobooks bundle now at ₹199 (or ₹149 if they ask for a discount).
+2. DELIVERY TRUTH: Immediately upon payment, a permanent Google Drive lifetime access link is delivered within 60 seconds to their WhatsApp & Email for unlimited lifetime downloads & reading.
+3. LANGUAGE MATCHING: MUST reply in the exact language the user wrote (Hinglish, Hindi, English, Tamil, Telugu, Marathi, Bengali, etc.).
 4. KEY FACTS:
-   - DELIVERY: 100% instant Google Drive lifetime access link delivered to WhatsApp & Email within 60 seconds of payment.
-   - CONTENT: 5,00,000+ eBooks across 16+ categories (Business, AI, Coding, Self-Help, Finance, Psychology, UPSC, etc.) + 500GB Audiobooks.
-   - COMPATIBILITY: Read on Mobile, Tablet, Laptop & Kindle anytime.
-   - VALUE: Less than ₹0.0004 per book. No subscriptions, one-time payment.
-   - GUARANTEE: 100% risk-free instant delivery guarantee.
-5. CONCISENESS: Keep answers punchy (2-4 sentences max). End with a strong conversion nudge or checkout link.`;
+   - 5,00,000+ eBooks across 16+ categories (Business, Stock Market, Coding, AI, Self-Help, Psychology, UPSC, Novels, Fiction).
+   - BONUS: 500GB High-Quality Audiobooks included completely FREE.
+   - Compatibility: Read on Mobile, Tablet, Laptop & Kindle anytime.
+   - Value: Costs less than ₹0.0004 per book with zero recurring subscriptions.
+   - 100% Risk-Free: 60-Second Instant Delivery Guarantee & Full Support.
+5. CONCISENESS: Keep answers strictly 2 to 3 sentences maximum. Be intellectual, helpful, encouraging, and always include a friendly conversion nudge.`;
 
 function getPsychologicalFallback(userText: string): { reply: string; show149?: boolean } {
   const t = userText.toLowerCase();
@@ -100,41 +99,20 @@ export function SalesCloserChat({
     setInputValue("");
     setIsTyping(true);
 
+    const isDiscountQuery =
+      text.toLowerCase().includes("discount") ||
+      text.toLowerCase().includes("kam") ||
+      text.toLowerCase().includes("149") ||
+      text.toLowerCase().includes("offer") ||
+      text.toLowerCase().includes("sasta");
+
     try {
       let replyText = "";
-      let show149 = false;
-
-      if (GEMINI_API_KEY) {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [
-                {
-                  role: "user",
-                  parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${text}` }],
-                },
-              ],
-              generationConfig: {
-                maxOutputTokens: 200,
-                temperature: 0.6,
-              },
-            }),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        }
-      }
-
-      if (!replyText) {
+      try {
+        replyText = await generateGeminiResponse(SYSTEM_PROMPT, text);
+      } catch {
         const fb = getPsychologicalFallback(text);
         replyText = fb.reply;
-        show149 = fb.show149 || false;
       }
 
       setTimeout(() => {
@@ -144,12 +122,12 @@ export function SalesCloserChat({
           sender: "agent",
           text: replyText,
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          cta: show149
+          cta: isDiscountQuery
             ? { label: "CLAIM ₹149 DISCOUNT ACCESS ➔", url: checkoutUrl }
             : { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl },
         };
         setMessages((prev) => [...prev, agentMsg]);
-      }, 750);
+      }, 700);
     } catch {
       setIsTyping(false);
       const fb = getPsychologicalFallback(text);
@@ -225,7 +203,7 @@ export function SalesCloserChat({
                   <span>Rohan (Simpex Library)</span>
                   <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-full font-bold">Verified</span>
                 </p>
-                <p className="text-[10px] text-emerald-200">Online • Replies in 60s with Drive Link</p>
+                <p className="text-[10px] text-emerald-200">Online • Powered by Gemini 3.6 Flash</p>
               </div>
             </div>
             <button
