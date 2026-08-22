@@ -19,14 +19,14 @@ export function ExitIntentModal({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1. BACK BUTTON TRAP (Mobile, Instagram, Chrome, Safari, Desktop):
-    // Push dummy history entry immediately so clicking Back triggers popstate
+    // BACK BUTTON ONLY TRAP:
+    // Push dummy history entry so clicking Back triggers popstate and opens modal
     try {
       window.history.pushState({ modalTrap: true }, "", window.location.href);
     } catch {}
 
     const handlePopState = () => {
-      // Re-push so page doesn't exit and show the ₹149 offer modal immediately
+      // Re-push history state so user remains on page with modal open
       try {
         window.history.pushState({ modalTrap: true }, "", window.location.href);
       } catch {}
@@ -35,33 +35,8 @@ export function ExitIntentModal({
 
     window.addEventListener("popstate", handlePopState);
 
-    // 2. DESKTOP EXIT-INTENT: Mouse moving above viewport top
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 15 || e.relatedTarget === null) {
-        setIsOpen(true);
-      }
-    };
-    document.addEventListener("mouseleave", handleMouseLeave);
-
-    // 3. MOBILE RAPID SCROLL-UP TRIGGER
-    let lastY = window.scrollY;
-    let maxY = 0;
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY > maxY) maxY = currentY;
-
-      // If user explored past 350px and rapidly scrolls up by > 140px
-      if (maxY > 350 && lastY - currentY > 140) {
-        setIsOpen(true);
-      }
-      lastY = currentY;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
     return () => {
       window.removeEventListener("popstate", handlePopState);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
