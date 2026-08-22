@@ -13,6 +13,7 @@ import booksEnglish2 from "@/assets/books-english-2.jpg";
 import booksHindi2 from "@/assets/books-hindi-2.jpg";
 
 import { ExitIntentModal } from "@/components/ExitIntentModal";
+import { StickyTimerBar } from "@/components/StickyTimerBar";
 import { indianBuyers, relativeTimeOptions, type Buyer } from "@/data/buyers";
 
 import heroVideo from "@/assets/hero-video.mp4.asset.json";
@@ -61,22 +62,59 @@ function CtaButton({
   children,
   className = "",
   size = "lg",
+  showTrustBadges = true,
 }: {
   children: React.ReactNode;
   className?: string;
   size?: "lg" | "sm";
+  showTrustBadges?: boolean;
 }) {
   return (
-    <a
-      href={CHECKOUT_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`btn-cta inline-flex items-center justify-center rounded-full font-extrabold tracking-tight hover:-translate-y-0.5 hover:brightness-105 ${
-        size === "lg" ? "px-8 py-4 text-base sm:text-lg" : "px-6 py-3 text-sm"
-      } ${className}`}
-    >
-      {children}
-    </a>
+    <div className={`flex flex-col items-center justify-center ${className}`}>
+      <a
+        href={CHECKOUT_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`btn-cta inline-flex items-center justify-center rounded-2xl font-extrabold tracking-tight shadow-xl shadow-primary/25 transition-transform duration-200 hover:scale-[1.02] hover:brightness-105 active:scale-[0.98] ${
+          size === "lg" ? "px-8 py-4 text-base sm:text-lg" : "px-6 py-3 text-sm"
+        }`}
+      >
+        {children}
+      </a>
+
+      {showTrustBadges && (
+        <div className="mt-3 flex flex-col items-center text-center">
+          {/* Indian Payment Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+            <span className="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[10px] font-black text-[#4285F4] shadow-sm sm:text-xs">
+              <span className="text-[#EA4335]">G</span>Pay
+            </span>
+            <span className="inline-flex items-center rounded-md bg-[#5f259f] px-2 py-0.5 text-[10px] font-black text-white shadow-sm sm:text-xs">
+              PhonePe
+            </span>
+            <span className="inline-flex items-center rounded-md bg-[#002e6e] px-2 py-0.5 text-[10px] font-black text-[#00b9f5] shadow-sm sm:text-xs">
+              Paytm
+            </span>
+            <span className="inline-flex items-center rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-black text-white shadow-sm sm:text-xs">
+              UPI
+            </span>
+            <span className="inline-flex items-center rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-black text-amber-400 shadow-sm sm:text-xs">
+              Debit/Cards
+            </span>
+            <span className="inline-flex items-center rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-black text-slate-200 shadow-sm sm:text-xs">
+              NetBanking
+            </span>
+          </div>
+
+          {/* Security Subline */}
+          <p className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] font-bold text-muted-foreground sm:text-xs">
+            <span className="text-primary">🔒 256-Bit SSL Encrypted</span>
+            <span>•</span>
+            <span className="text-emerald-400">⚡ Instant Google Drive Delivery</span>
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -637,14 +675,8 @@ function Index() {
         </div>
       </footer>
 
-      {/* Sticky mobile CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 p-3 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-center">
-          <CtaButton size="sm" className="w-full max-w-md">
-            YES, UNLOCK MY LIBRARY @ ₹199
-          </CtaButton>
-        </div>
-      </div>
+      {/* Dual Element Sticky Countdown & Buy Bar */}
+      <StickyTimerBar checkoutUrl={CHECKOUT_URL} />
 
       <PurchasePopup />
 
