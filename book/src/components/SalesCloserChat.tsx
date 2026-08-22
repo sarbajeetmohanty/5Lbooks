@@ -198,10 +198,31 @@ export function SalesCloserChat({
       text.toLowerCase().includes("paisa") ||
       text.toLowerCase().includes("coupon");
 
+    const isBuyIntent =
+      isDiscountQuery ||
+      text.toLowerCase().includes("buy") ||
+      text.toLowerCase().includes("link") ||
+      text.toLowerCase().includes("purchase") ||
+      text.toLowerCase().includes("pay") ||
+      text.toLowerCase().includes("drive") ||
+      text.toLowerCase().includes("kaise milega") ||
+      text.toLowerCase().includes("kaise kharide") ||
+      text.toLowerCase().includes("lena hai") ||
+      text.toLowerCase().includes("order") ||
+      text.toLowerCase().includes("price") ||
+      text.toLowerCase().includes("cost");
+
+    let cta: { label: string; url: string } | undefined = undefined;
+    if (isDiscountQuery) {
+      cta = { label: "CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl };
+    } else if (isBuyIntent) {
+      cta = { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl };
+    }
+
     try {
       let replyText = "";
       try {
-        replyText = await generateGeminiResponse(EBOOK_KNOWLEDGE_BASE_PROMPT, text);
+        replyText = await generateGeminiResponse(EBOOK_KNOWLEDGE_BASE_PROMPT, text, messages);
       } catch {
         const fb = getPsychologicalFallback(text);
         replyText = fb.reply;
@@ -214,9 +235,7 @@ export function SalesCloserChat({
           sender: "agent",
           text: replyText,
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          cta: isDiscountQuery
-            ? { label: "CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl }
-            : { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl },
+          cta: cta,
         };
         setMessages((prev) => [...prev, agentMsg]);
       }, 650);
@@ -228,9 +247,7 @@ export function SalesCloserChat({
         sender: "agent",
         text: fb.reply,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        cta: isDiscountQuery
-          ? { label: "CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl }
-          : { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl },
+        cta: cta,
       };
       setMessages((prev) => [...prev, agentMsg]);
     }

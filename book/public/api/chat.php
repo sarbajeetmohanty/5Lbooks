@@ -57,8 +57,8 @@ foreach ($models as $model) {
             ]
         ],
         'generationConfig' => [
-            'maxOutputTokens' => 180,
-            'temperature' => 0.7
+            'maxOutputTokens' => 800,
+            'temperature' => 0.65
         ]
     ];
 

@@ -31,28 +31,70 @@ function getNextApiKey(): string {
   return key;
 }
 
+export type HistoryMessage = {
+  sender: "agent" | "user";
+  text: string;
+};
+
 export async function generateGeminiResponse(
   systemPrompt: string,
-  userMessage: string
+  currentMessage: string,
+  history: HistoryMessage[] = []
 ): Promise<string> {
-  // 1. Try secure private server endpoint first (/api/chat.php on Hostinger Apache)
+  // 1. Try secure private server endpoint first if available
   try {
     const serverRes = await fetch("/api/chat.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userMessage }),
+      body: JSON.stringify({ message: currentMessage }),
     });
     if (serverRes.ok) {
       const serverData = await serverRes.json();
-      if (serverData?.reply) {
+      if (serverData?.reply && serverData.reply.length > 5) {
         return serverData.reply.trim();
       }
     }
   } catch {
-    // Fall back to direct encrypted client pool if server endpoint is unavailable
+    // Fall back to direct pool
   }
 
-  // 2. Direct encrypted pool fallback
+  // 2. Build multi-turn conversational contents
+  const formattedContents: Array<{ role: string; parts: Array<{ text: string }> }> = [
+    {
+      role: "user",
+      parts: [
+        {
+          text: `${systemPrompt}\n\nIMPORTANT INSTRUCTIONS:\n- You are having a real-time chat with a visitor.\n- Give complete, clear, helpful answers (2-3 sentences).\n- NEVER cut off mid-sentence.\n- Mirror the user's language (Hinglish/Hindi/English).\n- Reassure them that payment gives instant Google Drive access in 60 seconds on WhatsApp & Email.`,
+        },
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {
+          text: "Understood! I will represent the Simpex Media Team and reply warmly, completely, and naturally to convert the customer.",
+        },
+      ],
+    },
+  ];
+
+  // Include recent conversation turns (up to last 6)
+  const recentHistory = history.slice(-6);
+  for (const h of recentHistory) {
+    if (h.text && h.text.trim()) {
+      formattedContents.push({
+        role: h.sender === "user" ? "user" : "model",
+        parts: [{ text: h.text }],
+      });
+    }
+  }
+
+  // Add the current user query
+  formattedContents.push({
+    role: "user",
+    parts: [{ text: currentMessage }],
+  });
+
   const maxAttempts = GEMINI_KEYS.length;
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -65,19 +107,10 @@ export async function generateGeminiResponse(
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  {
-                    text: `${systemPrompt}\n\nUser Question / Message: "${userMessage}"\n\nRemember: Talk like a real human support team member. Keep it short (1-2 sentences), natural, warm, and conversational.`,
-                  },
-                ],
-              },
-            ],
+            contents: formattedContents,
             generationConfig: {
-              maxOutputTokens: 180,
-              temperature: 0.7,
+              maxOutputTokens: 800,
+              temperature: 0.65,
             },
           }),
         });
@@ -85,7 +118,7 @@ export async function generateGeminiResponse(
         if (response.ok) {
           const data = await response.json();
           const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-          if (text) {
+          if (text && text.length > 5) {
             return text;
           }
         }
