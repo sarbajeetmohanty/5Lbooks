@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+  </defs>
+  <!-- Shield Base -->
+  <path d="M256 32L64 96v160c0 144 80 236 192 256 112-20 192-112 192-256V96L256 32z" fill="url(#shieldGrad)" stroke="url(#goldGrad)" stroke-width="20" stroke-linejoin="round" />
+  
+  <!-- Inner Gold Border -->
+  <path d="M256 64L96 118v138c0 120 68 196 160 214 92-18 160-94 160-214V118L256 64z" fill="none" stroke="url(#goldGrad)" stroke-width="8" opacity="0.6" />
+
+  <!-- Rupee Symbol & Checkmark Emblem -->
+  <path d="M200 160h112M200 195h112M200 230h50a35 35 0 0 0 0-70M245 230l65 80" stroke="#ffffff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  
+  <!-- Gold Star on Top -->
+  <polygon points="256,90 263,110 284,110 267,122 273,142 256,130 239,142 245,122 228,110 249,110" fill="url(#goldGrad)" />
+</svg>
