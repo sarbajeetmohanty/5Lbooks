@@ -14,6 +14,7 @@ import booksHindi2 from "@/assets/books-hindi-2.jpg";
 
 import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { StickyTimerBar } from "@/components/StickyTimerBar";
+import { PaymentBadges } from "@/components/PaymentBadges";
 import { indianBuyers, relativeTimeOptions, type Buyer } from "@/data/buyers";
 
 import heroVideo from "@/assets/hero-video.mp4.asset.json";
@@ -82,38 +83,7 @@ function CtaButton({
         {children}
       </a>
 
-      {showTrustBadges && (
-        <div className="mt-3 flex flex-col items-center text-center">
-          {/* Indian Payment Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-            <span className="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[10px] font-black text-[#4285F4] shadow-sm sm:text-xs">
-              <span className="text-[#EA4335]">G</span>Pay
-            </span>
-            <span className="inline-flex items-center rounded-md bg-[#5f259f] px-2 py-0.5 text-[10px] font-black text-white shadow-sm sm:text-xs">
-              PhonePe
-            </span>
-            <span className="inline-flex items-center rounded-md bg-[#002e6e] px-2 py-0.5 text-[10px] font-black text-[#00b9f5] shadow-sm sm:text-xs">
-              Paytm
-            </span>
-            <span className="inline-flex items-center rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-black text-white shadow-sm sm:text-xs">
-              UPI
-            </span>
-            <span className="inline-flex items-center rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-black text-amber-400 shadow-sm sm:text-xs">
-              Debit/Cards
-            </span>
-            <span className="inline-flex items-center rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-black text-slate-200 shadow-sm sm:text-xs">
-              NetBanking
-            </span>
-          </div>
-
-          {/* Security Subline */}
-          <p className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] font-bold text-muted-foreground sm:text-xs">
-            <span className="text-primary">🔒 256-Bit SSL Encrypted</span>
-            <span>•</span>
-            <span className="text-emerald-400">⚡ Instant Google Drive Delivery</span>
-          </p>
-        </div>
-      )}
+      {showTrustBadges && <PaymentBadges className="mt-3.5" />}
     </div>
   );
 }
