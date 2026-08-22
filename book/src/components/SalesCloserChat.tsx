@@ -407,7 +407,7 @@ export function SalesCloserChat({
 
       {/* WhatsApp Styled Live Chat Modal Window */}
       {isOpen && (
-        <div className="fixed bottom-20 right-3 z-50 flex h-[520px] max-h-[82vh] w-[92vw] max-w-sm flex-col overflow-hidden rounded-3xl border-2 border-[#075E54]/40 bg-[#0B141A] shadow-2xl shadow-black animate-scale-in sm:bottom-24 sm:right-6">
+        <div className="fixed bottom-20 right-3 z-[60] flex h-[520px] max-h-[82vh] w-[92vw] max-w-sm flex-col overflow-hidden rounded-3xl border-2 border-[#075E54]/40 bg-[#0B141A] shadow-2xl shadow-black animate-scale-in sm:bottom-24 sm:right-6">
           {/* Header */}
           <div className="flex items-center justify-between bg-[#075E54] px-4 py-3 text-white">
             <div className="flex items-center gap-2.5">

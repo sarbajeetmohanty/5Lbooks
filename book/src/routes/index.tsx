@@ -275,7 +275,7 @@ function PurchasePopup() {
   if (!visible || !currentBuyer) return null;
 
   return (
-    <div className="animate-pop-in fixed bottom-24 left-4 z-50 max-w-[19rem] rounded-2xl border border-border bg-card p-3 shadow-[var(--shadow-card)] sm:bottom-6">
+    <aside aria-label="Recent buyer alert" className="animate-pop-in fixed bottom-24 left-3 z-40 max-w-[16rem] sm:max-w-[18rem] rounded-2xl border border-border/80 bg-card/95 p-3 shadow-2xl backdrop-blur-md sm:bottom-24 sm:left-6">
       <div className="flex items-center gap-3 text-left">
         <img src={logo} alt="" width={40} height={40} className="h-10 w-10 rounded-xl" />
         <div>
@@ -291,7 +291,7 @@ function PurchasePopup() {
           </p>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
 
