@@ -12,86 +12,98 @@ type Message = {
   };
 };
 
-const EBOOK_KNOWLEDGE_BASE_PROMPT = `You are a top-tier senior digital library consultant & sales closing master from the "Simpex Media Team" representing the "5,00,000+ Premium eBooks + 500GB Audiobooks Library Bundle".
+const EBOOK_KNOWLEDGE_BASE_PROMPT = `You are a friendly, helpful library advisor from the Simpex Media Team for the 5,00,000+ eBooks + 500GB Audiobooks Library Bundle.
 
-YOUR PSYCHOLOGICAL SALES MISSION:
-Your goal is to turn ANY hesitant reader, student, professional, or visitor from "just browsing" into an enthusiastic, confident buyer within 1-2 exchanges. You talk like a real, intellectual, warm human advisor on WhatsApp (NOT an AI robot).
+CRITICAL INSTRUCTIONS:
+1. USE VERY SIMPLE, COMMON WORDS:
+   - Never use difficult English or complicated words.
+   - Use simple, everyday words that everyone understands easily (Hindi, Hinglish, or simple English).
+   - Keep replies short (2 to 3 simple sentences).
+2. COMPLETE SITE DATA:
+   - 5,00,000+ eBooks across top categories: Business, Share Market / Trading, AI & Coding, Self-Help, Mindset, UPSC & Govt Exams, Novels, Fiction, Health, Marketing.
+   - Free Bonus: 500GB High-Quality Audiobooks included.
+   - Works easily on Mobile phone, Tablet, Laptop, PC and Kindle (PDF & EPUB format).
+   - Cost is less than 40 paise per 1000 books! One-time ₹199, lifetime access.
+   - 60-second delivery to WhatsApp & Email via Google Drive. 100% money-back guarantee.
+3. DISCOUNT RULE (ONLY IF USER ASKS):
+   - If the user types and asks for a discount, coupon, or says price is high, say:
+     "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you."
+4. ANTI-BYPASS:
+   - If user asks random unrelated questions, bring them politely back to helping them unlock this mega library.
+5. CONVERSION:
+   - Always encourage them warmly to start reading today.`;
 
-COMPLETE KNOWLEDGE BASE ABOUT THE EBOOK LIBRARY BUNDLE:
-1. WHAT IS INSIDE:
-   - 5,00,000+ Premium eBooks across 16+ Mega High-Value Categories:
-     * Business, Startups & Entrepreneurship
-     * Stock Market, Trading, Forex & Technical Analysis
-     * AI, Coding, Machine Learning & Tech
-     * Self-Help, Productivity, Mindset & Psychology
-     * Wealth, Investing & Personal Finance (Rich Dad, Warren Buffett style)
-     * UPSC, Banking, SSC, Govt & Competitive Exam Materials
-     * Global Bestselling Fiction & Novels (Thrillers, Sci-Fi, Classics)
-     * Marketing, Copywriting & Sales
-     * Health, Fitness, Diet & Yoga
-     * Biographies, History, Philosophy & Science
-   - FREE BONUS: 500GB High-Quality Audiobooks of world bestsellers.
-2. COMPATIBILITY & FORMATS:
-   - Formats: High-Resolution PDF, EPUB & MOBI.
-   - Works seamlessly on Mobile (Android / iPhone), Tablet / iPad, Windows PC, Mac, and Kindle readers.
-   - Lifetime validity with unlimited downloads from Google Drive.
-3. DELIVERY & ACCESS:
-   - Permanent Google Drive lifetime access link delivered to WhatsApp & Email within 60 seconds of payment.
-   - Over 45,000+ satisfied Indian readers. 100% Risk-Free Money-Back Delivery Guarantee.
-4. PRICING & SPECIAL CUSTOMER DISCOUNT RULE:
-   - Standard Price: ₹199 (One-time payment, zero subscriptions, less than ₹0.0004 per book).
-   - If user asks for a discount, coupon, says price is high, or hesitates on ₹199, you MUST enthusiastically say:
-     "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you." and close them with the ₹149 offer.
-5. ANTI-BYPASS & FOCUS GUARDRAIL:
-   - If user asks unrelated random questions, coding, off-topic, or asks for free piracy links without paying, politely and firmly guide them back:
-     "Main yahan aapki library bundle unlock karne aur best books guide karne ke liye hoon! 📚 Kya main aapko ₹199 (ya VIP ₹149) checkout link share karoon?"
-6. HUMAN CONVERSATIONAL STYLE:
-   - Reply in 1 to 2 warm, punchy, conversational sentences.
-   - Mirror the user's exact language (Hinglish, Hindi, English, Tamil, Telugu, Marathi, Bengali, etc.).
-   - Always end with a comforting, low-friction buying nudge.`;
-
-function getPsychologicalFallback(userText: string): { reply: string; isDiscount?: boolean } {
+function getContextualCta(userText: string, checkoutUrl: string): { label: string; url: string } {
   const t = userText.toLowerCase();
 
-  // Discount Query
   if (
     t.includes("discount") ||
     t.includes("kam") ||
-    t.includes("price") ||
     t.includes("149") ||
     t.includes("offer") ||
     t.includes("coupon") ||
     t.includes("sasta") ||
-    t.includes("paisa") ||
     t.includes("less") ||
-    t.includes("bargain")
+    t.includes("paisa")
+  ) {
+    return { label: "🎁 CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl };
+  }
+
+  if (t.includes("link") || t.includes("drive") || t.includes("delivery") || t.includes("kaise milega")) {
+    return { label: "⚡ GET INSTANT DRIVE ACCESS @ ₹199 ➔", url: checkoutUrl };
+  }
+
+  if (t.includes("safe") || t.includes("trust") || t.includes("fake") || t.includes("scam") || t.includes("refund")) {
+    return { label: "🛡️ UNLOCK 100% RISK-FREE @ ₹199 ➔", url: checkoutUrl };
+  }
+
+  if (
+    t.includes("book") ||
+    t.includes("novel") ||
+    t.includes("audio") ||
+    t.includes("stock") ||
+    t.includes("upsc") ||
+    t.includes("category")
+  ) {
+    return { label: "📚 UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl };
+  }
+
+  return { label: "👉 BUY NOW & GET INSTANT ACCESS @ ₹199 ➔", url: checkoutUrl };
+}
+
+function getPsychologicalFallback(userText: string): { reply: string } {
+  const t = userText.toLowerCase();
+
+  if (
+    t.includes("discount") ||
+    t.includes("kam") ||
+    t.includes("149") ||
+    t.includes("offer") ||
+    t.includes("coupon") ||
+    t.includes("sasta") ||
+    t.includes("less") ||
+    t.includes("paisa")
   ) {
     return {
       reply:
-        "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Niche diye button par tap karke instant lifetime access grab kar lijiye: 👇",
-      isDiscount: true,
+        "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Niche diye button par tap karke turant access le lijiye! 👇",
     };
   }
 
-  // Delivery / Drive Link
   if (
     t.includes("link") ||
     t.includes("kaise") ||
     t.includes("how") ||
     t.includes("receive") ||
     t.includes("delivery") ||
-    t.includes("drive") ||
-    t.includes("kaha") ||
-    t.includes("email") ||
-    t.includes("whatsapp")
+    t.includes("drive")
   ) {
     return {
       reply:
-        "Payment complete hote hi 60 seconds ke andar Google Drive ka permanent lifetime link aapke WhatsApp aur Email dono par turant mil jayega! ⚡ Lifetime validity hai, jitni baar chahein download kijiye. 📥",
+        "Payment hote hi 1 minute ke andar Google Drive ka permanent link aapke WhatsApp aur Email dono par mil jayega! ⚡ Jab chahein download kijiye aur padhiye. 📥",
     };
   }
 
-  // Categories / Audiobooks / Topics
   if (
     t.includes("audiobook") ||
     t.includes("audio") ||
@@ -99,33 +111,21 @@ function getPsychologicalFallback(userText: string): { reply: string; isDiscount
     t.includes("topic") ||
     t.includes("stock") ||
     t.includes("business") ||
-    t.includes("upsc") ||
-    t.includes("hindi") ||
     t.includes("novel")
   ) {
     return {
       reply:
-        "Isme 16+ top categories hain — Business, Trading, AI, Mindset, UPSC, Novels aur saath mein 500GB high-quality Audiobooks FREE bonus included hain! 🎧📚",
+        "Isme 16 se jyada categories hain — Business, Trading, AI, Coding, Self-Help, UPSC, Novels aur saath me 500GB Audiobooks FREE included hain! 📚🎧",
     };
   }
 
-  // Devices / Compatibility
-  if (
-    t.includes("phone") ||
-    t.includes("mobile") ||
-    t.includes("laptop") ||
-    t.includes("pc") ||
-    t.includes("kindle") ||
-    t.includes("ipad") ||
-    t.includes("device")
-  ) {
+  if (t.includes("phone") || t.includes("mobile") || t.includes("laptop") || t.includes("kindle")) {
     return {
       reply:
-        "Haan ji! Sabhi eBooks PDF aur EPUB format me hain, jo aapke Mobile, Tablet, Laptop aur Kindle sab pe smoothly chalte hain. 📱💻",
+        "Haan ji! Sabhi books PDF aur EPUB format me hain, jo aapke Mobile, Tablet, Laptop aur Kindle sab pe bina kisi dikkat ke chalti hain. 📱💻",
     };
   }
 
-  // Trust / Safe / Guarantee
   if (
     t.includes("safe") ||
     t.includes("trust") ||
@@ -137,14 +137,13 @@ function getPsychologicalFallback(userText: string): { reply: string; isDiscount
   ) {
     return {
       reply:
-        "100% Verified & Safe! 🛡️ 45,000+ readers already access le chuke hain. 60-second instant Google Drive access or 100% money-back guarantee hai. Aap safely join kar sakte hain! ✅",
+        "100% Safe & Verified hai! 🛡️ 45,000+ readers already join kar chuke hain. Instant 1-minute Google Drive delivery ya 100% money back guarantee hai. ✅",
     };
   }
 
-  // General / Objection Re-route
   return {
     reply:
-      "Ji! 5,00,000+ eBooks aur 500GB Audiobooks ka lifetime Google Drive access abhi sirf ₹199 mein mil raha hai (less than ₹0.0004 per book). Kya main aapko direct checkout link share karoon? 🚀",
+      "5,00,000+ eBooks aur 500GB Audiobooks ka lifetime Google Drive access abhi sirf ₹199 me mil raha hai. Lifetime validity hai aur unlimited downloads hain! 🚀",
   };
 }
 
@@ -188,36 +187,7 @@ export function SalesCloserChat({
     setInputValue("");
     setIsTyping(true);
 
-    const isDiscountQuery =
-      text.toLowerCase().includes("discount") ||
-      text.toLowerCase().includes("kam") ||
-      text.toLowerCase().includes("149") ||
-      text.toLowerCase().includes("offer") ||
-      text.toLowerCase().includes("sasta") ||
-      text.toLowerCase().includes("less") ||
-      text.toLowerCase().includes("paisa") ||
-      text.toLowerCase().includes("coupon");
-
-    const isBuyIntent =
-      isDiscountQuery ||
-      text.toLowerCase().includes("buy") ||
-      text.toLowerCase().includes("link") ||
-      text.toLowerCase().includes("purchase") ||
-      text.toLowerCase().includes("pay") ||
-      text.toLowerCase().includes("drive") ||
-      text.toLowerCase().includes("kaise milega") ||
-      text.toLowerCase().includes("kaise kharide") ||
-      text.toLowerCase().includes("lena hai") ||
-      text.toLowerCase().includes("order") ||
-      text.toLowerCase().includes("price") ||
-      text.toLowerCase().includes("cost");
-
-    let cta: { label: string; url: string } | undefined = undefined;
-    if (isDiscountQuery) {
-      cta = { label: "CLAIM ₹149 VIP ACCESS (VALID 10 MIN) ➔", url: checkoutUrl };
-    } else if (isBuyIntent) {
-      cta = { label: "UNLOCK 5,00,000+ LIBRARY @ ₹199 ➔", url: checkoutUrl };
-    }
+    const cta = getContextualCta(text, checkoutUrl);
 
     try {
       let replyText = "";
@@ -255,9 +225,9 @@ export function SalesCloserChat({
 
   const quickChips = [
     "Google Drive link kaise milega? 📥",
-    "Special discount milega kya? 🎁",
-    "Audiobooks bonus included hai? 🎧",
-    "Mobile & Laptop dono pe chalega? 📱",
+    "Kaun kaun si books hain? 📚",
+    "Mobile & Laptop pe chalega? 📱",
+    "Payment safe hai na? 🔒",
   ];
 
   return (
@@ -337,7 +307,7 @@ export function SalesCloserChat({
               return (
                 <div key={m.id} className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                   <div
-                    className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed shadow-md ${
+                    className={`max-w-[88%] rounded-2xl p-3 text-xs leading-relaxed shadow-md ${
                       isMe
                         ? "rounded-tr-none bg-[#005C4B] text-white"
                         : "rounded-tl-none bg-[#202C33] text-[#E9EDEF]"
@@ -347,7 +317,7 @@ export function SalesCloserChat({
                     {m.cta && (
                       <a
                         href={m.cta.url}
-                        className="mt-2.5 block rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 py-2.5 text-center text-[11px] font-black uppercase text-black shadow-md transition hover:scale-102 active:scale-98"
+                        className="mt-2.5 flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-2 px-3 text-center text-[11px] font-black uppercase text-slate-950 shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]"
                       >
                         {m.cta.label}
                       </a>
