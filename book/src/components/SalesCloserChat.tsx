@@ -112,7 +112,7 @@ export function SalesCloserChat({
     {
       id: "m1",
       sender: "agent",
-      text: "Hey! 👋 We are from Simpex Media team. How can we help you unlock your instant Google Drive access today?",
+      text: "Hey! 👋 We are from Simpex Media team. How can we help you?",
       time: "Just now",
     },
   ]);

@@ -20,13 +20,12 @@ function decodeKey(encoded: string): string {
   return Buffer.from(encoded, "base64").toString("utf-8");
 }
 
-export const GEMINI_KEYS = ENCODED_KEYS.map(decodeKey);
-
-const MODELS = ["gemini-3.6-flash", "gemini-flash-lite-latest", "gemini-3.5-flash-lite"];
+const GEMINI_KEYS = ENCODED_KEYS.map(decodeKey);
+const MODELS = ["gemini-3.6-flash", "gemini-flash-lite-latest"];
 
 let currentKeyIndex = 0;
 
-export function getNextApiKey(): string {
+function getNextApiKey(): string {
   const key = GEMINI_KEYS[currentKeyIndex];
   currentKeyIndex = (currentKeyIndex + 1) % GEMINI_KEYS.length;
   return key;
@@ -36,6 +35,24 @@ export async function generateGeminiResponse(
   systemPrompt: string,
   userMessage: string
 ): Promise<string> {
+  // 1. Try secure private server endpoint first (/api/chat.php on Hostinger Apache)
+  try {
+    const serverRes = await fetch("/api/chat.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userMessage }),
+    });
+    if (serverRes.ok) {
+      const serverData = await serverRes.json();
+      if (serverData?.reply) {
+        return serverData.reply.trim();
+      }
+    }
+  } catch {
+    // Fall back to direct encrypted client pool if server endpoint is unavailable
+  }
+
+  // 2. Direct encrypted pool fallback
   const maxAttempts = GEMINI_KEYS.length;
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -53,14 +70,14 @@ export async function generateGeminiResponse(
                 role: "user",
                 parts: [
                   {
-                    text: `${systemPrompt}\n\nUser Question / Message: "${userMessage}"\n\nRemember: Reply directly in the exact language the user wrote (Hindi/Hinglish/English/etc.) with high psychological empathy and a concise conversion close.`,
+                    text: `${systemPrompt}\n\nUser Question / Message: "${userMessage}"\n\nRemember: Talk like a real human support team member. Keep it short (1-2 sentences), natural, warm, and conversational.`,
                   },
                 ],
               },
             ],
             generationConfig: {
-              maxOutputTokens: 250,
-              temperature: 0.65,
+              maxOutputTokens: 180,
+              temperature: 0.7,
             },
           }),
         });
@@ -78,5 +95,5 @@ export async function generateGeminiResponse(
     }
   }
 
-  throw new Error("All Gemini API keys and models exhausted");
+  throw new Error("All Gemini channels exhausted");
 }
