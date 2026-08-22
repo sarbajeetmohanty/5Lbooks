@@ -36,6 +36,24 @@ export type HistoryMessage = {
   text: string;
 };
 
+function getLanguageInstruction(userText: string): string {
+  const t = userText.toLowerCase();
+  const hinglishWords = [
+    "kaise", "kya", "hai", "karo", "kare", "milega", "aayega", "kitna", "bhai",
+    "sir", "madam", "chahiye", "dena", "paisa", "sasta", "bacho", "bacche",
+    "karna", "chalega", "hoga", "sakte", "batao", "bhejo", "dedo", "kaha",
+    "bataiye", "le", "sakta", "padhe", "dekhe", "de", "dijiye", "raha", "rahi", "bolo"
+  ];
+  const isHinglish = hinglishWords.some(
+    (w) => t.split(/[\s,?.!]+/).includes(w) || t.includes(w + " ") || t.includes(" " + w)
+  );
+
+  if (isHinglish) {
+    return "MANDATORY LANGUAGE: The user asked in HINGLISH (Hindi written in English alphabet). You MUST reply ONLY in natural, simple Hinglish! Never reply in English.";
+  }
+  return "MANDATORY LANGUAGE: Reply in the exact same language and tone as the user (English if English, Hinglish if Hinglish, Hindi if Hindi).";
+}
+
 export async function generateGeminiResponse(
   systemPrompt: string,
   currentMessage: string,
@@ -58,13 +76,15 @@ export async function generateGeminiResponse(
     // Fall back to direct pool
   }
 
+  const langInstruction = getLanguageInstruction(currentMessage);
+
   // 2. Build multi-turn conversational contents
   const formattedContents: Array<{ role: string; parts: Array<{ text: string }> }> = [
     {
       role: "user",
       parts: [
         {
-          text: `${systemPrompt}\n\nIMPORTANT INSTRUCTIONS:\n- You are having a real-time chat with a visitor.\n- Give complete, clear, helpful answers (2-3 sentences).\n- NEVER cut off mid-sentence.\n- Mirror the user's language (Hinglish/Hindi/English).\n- Reassure them that payment gives instant Google Drive access in 60 seconds on WhatsApp & Email.`,
+          text: `${systemPrompt}\n\n${langInstruction}\n- Give complete, clear, simple answers (2-3 short sentences).\n- NEVER cut off mid-sentence.\n- Reassure them that payment gives instant Google Drive access in 60 seconds on WhatsApp & Email.`,
         },
       ],
     },
@@ -72,7 +92,7 @@ export async function generateGeminiResponse(
       role: "model",
       parts: [
         {
-          text: "Understood! I will represent the Simpex Media Team and reply warmly, completely, and naturally to convert the customer.",
+          text: "Understood! I will represent the Simpex Media Team and reply warmly, completely, and in the EXACT same language (Hinglish/Hindi/English) to convert the customer.",
         },
       ],
     },
@@ -89,10 +109,10 @@ export async function generateGeminiResponse(
     }
   }
 
-  // Add the current user query
+  // Add the current user query with strict language trigger
   formattedContents.push({
     role: "user",
-    parts: [{ text: currentMessage }],
+    parts: [{ text: `User Question: "${currentMessage}"\n[${langInstruction}]` }],
   });
 
   const maxAttempts = GEMINI_KEYS.length;
@@ -110,7 +130,7 @@ export async function generateGeminiResponse(
             contents: formattedContents,
             generationConfig: {
               maxOutputTokens: 800,
-              temperature: 0.65,
+              temperature: 0.5,
             },
           }),
         });
