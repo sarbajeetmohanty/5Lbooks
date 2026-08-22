@@ -12,28 +12,48 @@ type Message = {
   };
 };
 
-const SYSTEM_PROMPT = `You are a high-performing, intellectual, and highly persuasive senior library advisor from the Simpex Media team for "5,00,000+ Premium eBooks + 500GB Audiobooks Library Bundle".
+const EBOOK_KNOWLEDGE_BASE_PROMPT = `You are a top-tier senior digital library consultant & sales closing master from the "Simpex Media Team" representing the "5,00,000+ Premium eBooks + 500GB Audiobooks Library Bundle".
 
-YOUR MISSION & PSYCHOLOGY GUIDELINES:
-1. GREETING & IDENTITY: Always identify as "Simpex Media Team". Be sharp, polite, and encouraging.
-2. DISCOUNT & PRICING OBJECTION (SPECIAL CUSTOMER RULE):
-   - Whenever the user asks for a discount, coupon, says the price is high, or hesitates on paying ₹199, you MUST say:
-     "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. You can grab full lifetime access right now!" (in the user's language).
-3. DELIVERY TRUTH:
-   - Always assure them: "Payment complete hote hi 60 seconds ke andar Google Drive ka permanent lifetime link aapke WhatsApp aur Email dono par receive ho jayega."
-4. CORE LIBRARY HIGHLIGHTS:
-   - 5,00,000+ eBooks across 16+ categories (Business, Stock Market, Coding, AI, Self-Help, Psychology, UPSC, Novels, Fiction).
-   - FREE BONUS: 500GB High-Quality Audiobooks included.
-   - Read on Mobile, Tablet, Laptop & Kindle.
-   - Less than ₹0.0004 per book with zero recurring subscriptions.
-5. LANGUAGE MIRRORING:
-   - Match the user's exact language (Hinglish, Hindi, English, Tamil, Telugu, Marathi, Bengali, etc.).
-6. CONCISENESS & CLOSING:
-   - Keep answers strictly 2 to 3 sentences. Never write boring robotic paragraphs. Always end with a comforting call to action.`;
+YOUR PSYCHOLOGICAL SALES MISSION:
+Your goal is to turn ANY hesitant reader, student, professional, or visitor from "just browsing" into an enthusiastic, confident buyer within 1-2 exchanges. You talk like a real, intellectual, warm human advisor on WhatsApp (NOT an AI robot).
 
-function getPsychologicalFallback(userText: string): { reply: string; show149?: boolean } {
+COMPLETE KNOWLEDGE BASE ABOUT THE EBOOK LIBRARY BUNDLE:
+1. WHAT IS INSIDE:
+   - 5,00,000+ Premium eBooks across 16+ Mega High-Value Categories:
+     * Business, Startups & Entrepreneurship
+     * Stock Market, Trading, Forex & Technical Analysis
+     * AI, Coding, Machine Learning & Tech
+     * Self-Help, Productivity, Mindset & Psychology
+     * Wealth, Investing & Personal Finance (Rich Dad, Warren Buffett style)
+     * UPSC, Banking, SSC, Govt & Competitive Exam Materials
+     * Global Bestselling Fiction & Novels (Thrillers, Sci-Fi, Classics)
+     * Marketing, Copywriting & Sales
+     * Health, Fitness, Diet & Yoga
+     * Biographies, History, Philosophy & Science
+   - FREE BONUS: 500GB High-Quality Audiobooks of world bestsellers.
+2. COMPATIBILITY & FORMATS:
+   - Formats: High-Resolution PDF, EPUB & MOBI.
+   - Works seamlessly on Mobile (Android / iPhone), Tablet / iPad, Windows PC, Mac, and Kindle readers.
+   - Lifetime validity with unlimited downloads from Google Drive.
+3. DELIVERY & ACCESS:
+   - Permanent Google Drive lifetime access link delivered to WhatsApp & Email within 60 seconds of payment.
+   - Over 45,000+ satisfied Indian readers. 100% Risk-Free Money-Back Delivery Guarantee.
+4. PRICING & SPECIAL CUSTOMER DISCOUNT RULE:
+   - Standard Price: ₹199 (One-time payment, zero subscriptions, less than ₹0.0004 per book).
+   - If user asks for a discount, coupon, says price is high, or hesitates on ₹199, you MUST enthusiastically say:
+     "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you." and close them with the ₹149 offer.
+5. ANTI-BYPASS & FOCUS GUARDRAIL:
+   - If user asks unrelated random questions, coding, off-topic, or asks for free piracy links without paying, politely and firmly guide them back:
+     "Main yahan aapki library bundle unlock karne aur best books guide karne ke liye hoon! 📚 Kya main aapko ₹199 (ya VIP ₹149) checkout link share karoon?"
+6. HUMAN CONVERSATIONAL STYLE:
+   - Reply in 1 to 2 warm, punchy, conversational sentences.
+   - Mirror the user's exact language (Hinglish, Hindi, English, Tamil, Telugu, Marathi, Bengali, etc.).
+   - Always end with a comforting, low-friction buying nudge.`;
+
+function getPsychologicalFallback(userText: string): { reply: string; isDiscount?: boolean } {
   const t = userText.toLowerCase();
 
+  // Discount Query
   if (
     t.includes("discount") ||
     t.includes("kam") ||
@@ -43,44 +63,69 @@ function getPsychologicalFallback(userText: string): { reply: string; show149?: 
     t.includes("coupon") ||
     t.includes("sasta") ||
     t.includes("paisa") ||
-    t.includes("less")
+    t.includes("less") ||
+    t.includes("bargain")
   ) {
     return {
       reply:
         "Sir/Ma'am, you are our special customer! 🎁 For the next 10 minutes only, we have unlocked our VIP ₹149 offer for you. Niche diye button par tap karke instant lifetime access grab kar lijiye: 👇",
-      show149: true,
+      isDiscount: true,
     };
   }
 
+  // Delivery / Drive Link
   if (
     t.includes("link") ||
     t.includes("kaise") ||
     t.includes("how") ||
     t.includes("receive") ||
     t.includes("delivery") ||
-    t.includes("drive")
+    t.includes("drive") ||
+    t.includes("kaha") ||
+    t.includes("email") ||
+    t.includes("whatsapp")
   ) {
     return {
       reply:
-        "Payment complete hote hi 60 seconds ke andar Google Drive ka permanent lifetime link aapke WhatsApp aur Email dono par turant mil jayega! ⚡ Lifetime validity hai, jitni baar chahein download aur read kijiye. 📥",
+        "Payment complete hote hi 60 seconds ke andar Google Drive ka permanent lifetime link aapke WhatsApp aur Email dono par turant mil jayega! ⚡ Lifetime validity hai, jitni baar chahein download kijiye. 📥",
     };
   }
 
+  // Categories / Audiobooks / Topics
   if (
     t.includes("audiobook") ||
     t.includes("audio") ||
-    t.includes("hindi") ||
     t.includes("category") ||
     t.includes("topic") ||
     t.includes("stock") ||
-    t.includes("business")
+    t.includes("business") ||
+    t.includes("upsc") ||
+    t.includes("hindi") ||
+    t.includes("novel")
   ) {
     return {
       reply:
-        "Isme 16+ top categories hain — Business, Stock Market, AI, Coding, Mindset, UPSC, Novels aur saath mein 500GB high-quality Audiobooks FREE bonus included hain! 🎧📚",
+        "Isme 16+ top categories hain — Business, Trading, AI, Mindset, UPSC, Novels aur saath mein 500GB high-quality Audiobooks FREE bonus included hain! 🎧📚",
     };
   }
 
+  // Devices / Compatibility
+  if (
+    t.includes("phone") ||
+    t.includes("mobile") ||
+    t.includes("laptop") ||
+    t.includes("pc") ||
+    t.includes("kindle") ||
+    t.includes("ipad") ||
+    t.includes("device")
+  ) {
+    return {
+      reply:
+        "Haan ji! Sabhi eBooks PDF aur EPUB format me hain, jo aapke Mobile, Tablet, Laptop aur Kindle sab pe smoothly chalte hain. 📱💻",
+    };
+  }
+
+  // Trust / Safe / Guarantee
   if (
     t.includes("safe") ||
     t.includes("trust") ||
@@ -92,10 +137,11 @@ function getPsychologicalFallback(userText: string): { reply: string; show149?: 
   ) {
     return {
       reply:
-        "100% Verified & Safe! 🛡️ Abhi tak 45,000+ readers ne library unlock ki hai. Instant Drive access within 60 seconds or 100% money-back guarantee! ✅",
+        "100% Verified & Safe! 🛡️ 45,000+ readers already access le chuke hain. 60-second instant Google Drive access or 100% money-back guarantee hai. Aap safely join kar sakte hain! ✅",
     };
   }
 
+  // General / Objection Re-route
   return {
     reply:
       "Ji! 5,00,000+ eBooks aur 500GB Audiobooks ka lifetime Google Drive access abhi sirf ₹199 mein mil raha hai (less than ₹0.0004 per book). Kya main aapko direct checkout link share karoon? 🚀",
@@ -149,12 +195,13 @@ export function SalesCloserChat({
       text.toLowerCase().includes("offer") ||
       text.toLowerCase().includes("sasta") ||
       text.toLowerCase().includes("less") ||
+      text.toLowerCase().includes("paisa") ||
       text.toLowerCase().includes("coupon");
 
     try {
       let replyText = "";
       try {
-        replyText = await generateGeminiResponse(SYSTEM_PROMPT, text);
+        replyText = await generateGeminiResponse(EBOOK_KNOWLEDGE_BASE_PROMPT, text);
       } catch {
         const fb = getPsychologicalFallback(text);
         replyText = fb.reply;
