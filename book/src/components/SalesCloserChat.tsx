@@ -12,6 +12,49 @@ type Message = {
   };
 };
 
+function playWhatsAppChime() {
+  try {
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    if (ctx.state === "suspended") {
+      ctx.resume();
+    }
+
+    const now = ctx.currentTime;
+
+    // Tone 1: 850Hz to 1100Hz chime
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(850, now);
+    osc1.frequency.exponentialRampToValueAtTime(1100, now + 0.08);
+    gain1.gain.setValueAtTime(0.22, now);
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.18);
+
+    // Tone 2: 1250Hz to 1450Hz soft bell
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(1250, now + 0.06);
+    osc2.frequency.exponentialRampToValueAtTime(1450, now + 0.16);
+    gain2.gain.setValueAtTime(0.18, now + 0.06);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.06);
+    osc2.stop(now + 0.25);
+  } catch {
+    // Autoplay restrictions handled gracefully
+  }
+}
+
 const EBOOK_KNOWLEDGE_BASE_PROMPT = `You are a friendly library advisor from the Simpex Media Team for the 5,00,000+ eBooks + 500GB Audiobooks Library Bundle.
 
 #1 TOP PRIORITY RULE - EXACT LANGUAGE & SCRIPT MATCHING (CRITICAL):
@@ -161,6 +204,8 @@ export function SalesCloserChat({
   checkoutUrl?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTeaser, setShowTeaser] = useState(false);
+  const [teaserDismissed, setTeaserDismissed] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "m1",
@@ -180,6 +225,36 @@ export function SalesCloserChat({
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Proactive Teaser Bubble on Scroll (35%) or Timer (14s)
+  useEffect(() => {
+    if (teaserDismissed || isOpen) return;
+
+    const timer = setTimeout(() => {
+      if (!isOpen && !teaserDismissed) {
+        setShowTeaser(true);
+        playWhatsAppChime();
+      }
+    }, 14000);
+
+    const handleScroll = () => {
+      if (isOpen || teaserDismissed) return;
+      const scrollY = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0 && scrollY / docHeight >= 0.35) {
+        setShowTeaser(true);
+        playWhatsAppChime();
+        window.removeEventListener("scroll", handleScroll);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isOpen, teaserDismissed]);
 
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
@@ -208,6 +283,7 @@ export function SalesCloserChat({
 
       setTimeout(() => {
         setIsTyping(false);
+        playWhatsAppChime();
         const agentMsg: Message = {
           id: String(Date.now() + 1),
           sender: "agent",
@@ -219,6 +295,7 @@ export function SalesCloserChat({
       }, 650);
     } catch {
       setIsTyping(false);
+      playWhatsAppChime();
       const fb = getPsychologicalFallback(text);
       const agentMsg: Message = {
         id: String(Date.now() + 1),
@@ -241,6 +318,50 @@ export function SalesCloserChat({
 
   return (
     <>
+      {/* Proactive Floating Teaser Bubble */}
+      {showTeaser && !isOpen && (
+        <aside
+          aria-label="Chat assistant preview"
+          className="fixed bottom-38 right-4 z-40 max-w-[300px] rounded-2xl border-2 border-emerald-500/50 bg-[#0B141A]/95 p-3.5 text-white shadow-2xl backdrop-blur-md animate-scale-in sm:bottom-40 sm:right-6 cursor-pointer"
+          onClick={() => {
+            setIsOpen(true);
+            setShowTeaser(false);
+            setTeaserDismissed(true);
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="relative shrink-0">
+              <div className="grid h-9 w-9 place-items-center rounded-full bg-[#075E54] text-base">
+                👨‍💼
+              </div>
+              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-[#0B141A] bg-[#25D366]" />
+            </div>
+            <div className="flex-1 text-[11px] leading-snug">
+              <div className="flex items-center justify-between">
+                <p className="font-black text-[#25D366]">Simpex Support Online</p>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTeaser(false);
+                    setTeaserDismissed(true);
+                  }}
+                  className="grid h-5 w-5 place-items-center rounded-full bg-white/10 text-[10px] text-[#8696A0] hover:text-white cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="mt-1 text-[#E9EDEF]">
+                👋 Have a quick question? <strong>Simpex support is online</strong> to help you unlock instant Drive access!
+              </p>
+              <span className="mt-1.5 inline-block text-[10px] font-bold text-[#25D366] underline">
+                Tap to chat with us ➔
+              </span>
+            </div>
+          </div>
+        </aside>
+      )}
+
       {/* Floating WhatsApp Bubble Trigger */}
       <aside
         aria-label="Live sales assistant"
@@ -248,7 +369,11 @@ export function SalesCloserChat({
       >
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen);
+            setShowTeaser(false);
+            setTeaserDismissed(true);
+          }}
           className="hidden md:flex items-center gap-2 rounded-full border border-emerald-500/40 bg-card/95 px-3.5 py-1.5 text-xs font-extrabold text-foreground shadow-2xl backdrop-blur-md transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
         >
           <span className="flex h-2.5 w-2.5 relative">
@@ -260,7 +385,11 @@ export function SalesCloserChat({
 
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen);
+            setShowTeaser(false);
+            setTeaserDismissed(true);
+          }}
           aria-label="Open sales chat"
           className="relative grid h-13 w-13 place-items-center rounded-full bg-[#25D366] text-white shadow-2xl shadow-emerald-600/60 transition-transform duration-200 hover:bg-[#20bd5a] hover:scale-110 active:scale-95 cursor-pointer sm:h-14 sm:w-14"
         >
